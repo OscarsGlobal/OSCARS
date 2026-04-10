@@ -2,51 +2,95 @@
 % Please edit documentation in R/oscars.R
 \name{oscars}
 \alias{oscars}
-\title{OSCARS global minimization}
+\title{OSCARS-II for bound constrained global optimization}
 \usage{
-oscars(fname, ..., lwr, upr, nfmax = 1000, infol = -1)
+oscars(fname, lwr, upr, ..., controls = oscars.control())
 }
 \arguments{
 \item{fname}{An R function to be minimized. This function must take a vector
 of parameter values as its first argument, and return a scalar.  Additional
-arguments can be supplied via \code{...}}
-
-\item{...}{Additional parameters supplied to function \code{fname}.}
+arguments can be supplied via \code{...}   NaN and NA traps replace these
+with Inf when minimizing (or -Inf when maximizing).}
 
 \item{lwr}{A vector of lower bounds for the parameters of \code{fname}.
 Length is taken to be the number of parameters to minimize over. All bounds
 must be finite.}
 
-\item{upr}{A vector of upper bounds for the parameters of \code{fname}. All bounds
-must be finite.}
+\item{upr}{A vector of upper bounds for the parameters of \code{fname}. All
+bounds must be finite.}
 
-\item{nfmax}{The maximum number of function evaluations to perform.}
+\item{...}{Additional parameters supplied to function \code{fname}.}
 
-\item{infol}{Verbosity during iterations. If \code{infol} is positive,
-each new best function value is printed.}
+\item{controls}{A list of oscar control parameters, such as iteration
+budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
+and descriptions.}
 }
 \value{
-A list containing the best known set of parameters found during
-\code{nfmax} iterations and the minimized function value at the best known
-point.
+A list containing the best known set of parameters found, the
+of function evaluations used and the minimized function value at the best
+known point.   A message indicating why the method halted is also given.
 }
 \description{
-Performs global minimization of a general function subject to box constraints
-using the OSCARS direct search algorithm (<doi:toChrisPaper>).
-Oscars performs a fixed number of function evaluations and returns the
-best known point and the function evaluated at that point.
+Performs global optimization of a general black-box function subject
+to box constraints using a variant of the OSCARS-II
+algorithm (https://doi.org/10.1007/s10898-020-00928-6).
+
+Oscars is a stochastic direct search method which uses only function values
+at selected points.   It generates a finite sequence of nested boxes around
+a control point, and randomly samples each box in turn once.   A new set
+of nested boxes is formed if the current set is exhausted or a point better
+than the control point is found.   In the latter case the better point
+replaces the control.   From time to time the control point is reset to
+alternately a random point, or to the best known point.
+
+Oscars halts if the function evaluation budget is exhausted, or if both a
+significant number of function evaluations have been done, and the change
+in the best known value has been less than a given tolerance for the final
+function evaluations.
+
+The method returns the best known point, the function value at that
+point, and the number of function evaluations used.
+
+Please note: Global optimization problems can be arbitrarily hard, and
+no method that uses only function values at specified points is guaranteed
+to solve all such problems in a finite number of function evaluations.
 }
 \examples{
-# "banana" function with global minimum of zero at (a, a^2)
+# Branins camel function with global minima of f = -1.0316 at
+# (0.0898,0.7127) and (0.0898,-0.7127) with four other local minima
+camel <- function(par) {
+  x = par[1]
+  y = par[2]
+  f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
+  return(f) }
+out <- oscars(camel, lwr = c(-5,-5), upr = c(5,5))
+
+# Bird function in 2 dimensions.  Global minimum = -106.7645367198
+bird <- function(par)  {
+  x1 = par[1];  x2 = par[2]
+  f = sin(x1)*exp((1-cos(x2))^2) + cos(x2)*exp((1-sin(x1))^2) + (x1-x2)^2
+  return(f)
+} # end of bird function
+out <- oscars(bird, c(-10,-10), c(50,50))
+
+# Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
+hosaki <- function(par)  {
+  x = par[1]
+  y = par[2]
+  f = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*y*y*exp(-y)
+  return(f) }
+oscars(hosaki, lwr = c(0,0), upr = c(5,6))
+
+# The proper way to specify control parameters
+oscars(hosaki, lwr = c(0,0), upr = c(5,6),
+  controls = oscars.control(nfmax = 100000, fTol=10*oscars.control()$fTol))
+
+# Rosenbrocks "banana" function with global minimum of zero at (a, a^2)
 rosenbrock <- function(par, a = 1, b = 100){
-   (a - par[1])^2 + b*(par[2] - par[1]^2)^2
+   f = (a - par[1])^2 + b*(par[2] - par[1]^2)^2
+   return(f)
 }
 
-oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3)) # min is c(1,1)
-oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3), infol = 1)
-
-oscars(rosenbrock, a = 2, nfmax = 50000, lwr = c(-10,-10), upr = c(10,10)) # min is c(2,4)
-oscars(rosenbrock, a = 2, nfmax = 50000, lwr = c(-10,-10), upr = c(10,10), infol = 1)
-
+out <- oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3), a = 0.5)
 
 }

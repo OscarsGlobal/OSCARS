@@ -1,14 +1,35 @@
-#' @title OSCARS global minimization
+#' @title OSCARS-II for bound constrained global optimization
 #'
 #' @description
-#' Performs global minimization of a general function subject to box constraints
-#' using the OSCARS direct search algorithm (<doi:toChrisPaper>).
-#' Oscars performs a fixed number of function evaluations and returns the
-#' best known point and the function evaluated at that point.
+#' Performs global optimization of a general black-box function subject
+#' to box constraints using a variant of the OSCARS-II
+#' algorithm (https://doi.org/10.1007/s10898-020-00928-6).
+#'
+#' Oscars is a stochastic direct search method which uses only function values
+#' at selected points.   It generates a finite sequence of nested boxes around
+#' a control point, and randomly samples each box in turn once.   A new set
+#' of nested boxes is formed if the current set is exhausted or a point better
+#' than the control point is found.   In the latter case the better point
+#' replaces the control.   From time to time the control point is reset to
+#' alternately a random point, or to the best known point.
+#'
+#' Oscars halts if the function evaluation budget is exhausted, or if both a
+#' significant number of function evaluations have been done, and the change
+#' in the best known value has been less than a given tolerance for the final
+#' function evaluations.
+#'
+#' The method returns the best known point, the function value at that
+#' point, and the number of function evaluations used.
+#'
+#' Please note: Global optimization problems can be arbitrarily hard, and
+#' no method that uses only function values at specified points is guaranteed
+#' to solve all such problems in a finite number of function evaluations.
 #'
 #' @param fname An R function to be minimized. This function must take a vector
 #' of parameter values as its first argument, and return a scalar.  Additional
-#' arguments can be supplied via \code{...}
+#' arguments can be supplied via \code{...}   Missing (NaN and NA) function
+#' values are acceptable as they are replaced with Inf when minimizing
+#' (or -Inf when maximizing).
 #'
 #' @param ... Additional parameters supplied to function \code{fname}.
 #'
@@ -16,101 +37,158 @@
 #' Length is taken to be the number of parameters to minimize over. All bounds
 #' must be finite.
 #'
-#' @param upr A vector of upper bounds for the parameters of \code{fname}. All bounds
-#' must be finite.
+#' @param upr A vector of upper bounds for the parameters of \code{fname}. All
+#' bounds must be finite.
 #'
-#' @param nfmax The maximum number of function evaluations to perform.
+#' @param controls A list of oscar control parameters, such as iteration
+#' budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
+#' and descriptions.
 #'
-#' @param infol Verbosity during iterations. If \code{infol} is positive,
-#' each new best function value is printed.
-#'
-#' @return A list containing the best known set of parameters found during
-#' \code{nfmax} iterations and the minimized function value at the best known
-#' point.
+#' @return A list containing the best known set of parameters found, the
+#' of function evaluations used and the minimized function value at the best
+#' known point.   A message indicating why the method halted is also given.
 #'
 #' @examples
-#' # "banana" function with global minimum of zero at (a, a^2)
+#' # Branins camel function with global minima of f = -1.0316 at
+#' # (0.0898,0.7127) and (0.0898,-0.7127) with four other local minima
+#' camel <- function(par) {
+#'   x = par[1]
+#'   y = par[2]
+#'   f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
+#'   return(f) }
+#' out <- oscars(camel, lwr = c(-5,-5), upr = c(5,5))
+#'
+#' # Bird function in 2 dimensions.  Global minimum = -106.7645367198
+#' bird <- function(par)  {
+#'   x1 = par[1];  x2 = par[2]
+#'   f = sin(x1)*exp((1-cos(x2))^2) + cos(x2)*exp((1-sin(x1))^2) + (x1-x2)^2
+#'   return(f)
+#' } # end of bird function
+#' out <- oscars(bird, c(-10,-10), c(50,50))
+#'
+#' # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
+#' hosaki <- function(par)  {
+#'   x = par[1]
+#'   y = par[2]
+#'   f = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*y*y*exp(-y)
+#'   return(f) }
+#' out <- oscars(hosaki, lwr = c(0,0), upr = c(5,6))
+#'
+#' # The proper way to specify control parameters
+#' out <- oscars(hosaki, lwr = c(0,0), upr = c(5,6),
+#'   controls = oscars.control(nfmax = 100000, fTol=10*oscars.control()$fTol))
+#'
+#' # Rosenbrocks "banana" function with global minimum of zero at (a, a^2)
 #' rosenbrock <- function(par, a = 1, b = 100){
-#'    (a - par[1])^2 + b*(par[2] - par[1]^2)^2
+#'    f = (a - par[1])^2 + b*(par[2] - par[1]^2)^2
+#'    return(f)
 #' }
 #'
-#' oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3)) # min is c(1,1)
-#' oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3), infol = 1)
-#'
-#' oscars(rosenbrock, a = 2, nfmax = 50000, lwr = c(-10,-10), upr = c(10,10)) # min is c(2,4)
-#' oscars(rosenbrock, a = 2, nfmax = 50000, lwr = c(-10,-10), upr = c(10,10), infol = 1)
-#'
+#' out <- oscars(rosenbrock, lwr = c(-3,-3), upr = c(3,3), a = 0.5)
 #'
 #' @export
 oscars <- function(fname
-                  , ...
                   , lwr
                   , upr
-                  , nfmax = 1000
-                  , infol = -1
+                  , ...
+                  , controls = oscars.control()
                   ){
 
-  # Initialize the method.   n is the number of variables, hmin (> 0) is minimum
-  # box size after which the method resets.   Default is 1e-6.
-  n = length(lwr)
-  if (!exists('hmin')) {
-    hmin = 1e-6
+  nfmax = controls$nfmax
+  infol = controls$infol
+  DoMax = controls$DoMax
+  fTol = controls$fTol
+  xTol = controls$xTol
+
+  if(infol > 0){
+    cat("Control parameters:\n")
+    print(do.call(cbind, controls))
   }
 
-  # Define the algorithm parameters.  relcut is a flag.
-  # Trent recommends moving these to a 'control' list, see 'nlminb'
-  cutposn  = 0.9        # cut position A.  The cut passes through c + (1-A).(x-c)
-  cutratio = 1/3        # cutratio. Cuts along all axes > cutratio*longest for x-c
-  relcut = TRUE         # relA = 1 reduces A for non-longest axis cuts. (FLAG)
-  maxcycle1 = 90        # These two parameters give the max cycle length, which is (90)
-  maxcycle2 = 30        # maxcycle1 + cyclenumber * maxcycle2  (30)
-
-  # Initialize flags --- these are logical algorithm variables.
-  gogo = TRUE               # Set to zero to halt the program
-  NextResetBest = TRUE      # if true next cycle reset is to best point
-
-  # get the function value at the centre of the box.
+  # Initialize the method.   n is the number of variables.  xTol is the
+  # tolerance on decision variables defining the min sampling box size
+  n = length(lwr)
   edges = upr-lwr
+  xTol = max(1e-12,xTol)
+
+  # Define algorithm parameters.  DEFAULT SETTINGS STRONGLY RECOMMENDED.
+  # cutposn = cut position A. Cut is through c + (1-A).(x-c) where c is the
+  # control point and x is the new point.   0 < A < 1.  Default 0.9
+  cutposn  = 0.9
+  # cutratio. Cuts sampling box along an axis if absolute value of component of
+  # x-c along that axis is at least cutratio times largest abs value component.
+  # Default = 1/3.
+  cutratio = 1/3
+  # relcut = 1 reduces A for non-longest axis cuts. Default = TRUE
+  relcut = TRUE
+  # Each cycle automatically reset after (maxcycle1 + cyclenumber * maxcycle2)
+  # function evaluations.   Default is 30 + 30*cyclenumber.
+  maxcycle1 = 30
+  maxcycle2 = 30
+  # The algorithm halts due to negligible progress as measured by fTol if the
+  # number of cycles exceeds MinNrCycles (default = 8) and best known absolute
+  # function value agree within an absolute (if best known value < 1) or
+  # relative error of fTol for the last (stallratio-1) function evaluations.
+  stallratio = 3/2
+  MinNrCycles = 8
+
+  # Initialize logical algorithm variables.
+  gogo = TRUE               # Set to zero to halt the program
+  NewCycle = FALSE          # Set to true to start a new cycle.
+  NextResetBest = FALSE     # if true next cycle reset is to best point
+  # Use all nfmax function evaluations if objective tolerance is negative
+  if (fTol < 0) Use_fTol = FALSE  else  Use_fTol = TRUE
+
+  # Set up the bounds on the sampling box.
   boxlwr = lwr
   boxupr = upr
+  # get initial function value at centre of the box = start point of cycle 1.
   xb = (lwr+upr)/2
   fb = fname(xb, ...)
+  if (DoMax)  fb = -fb
+  if (is.nan(fb) | is.na(fb))  fb = Inf
   xc = xb
   fc = fb
+  # Set up the mark to monitor progress of f value for fTol stopping rule
+  fmark = fb
+  nfmark = 1
+  fgap = fTol*max(1,abs(fmark))
 
   # Set up the counters
   CycleNr = 1
   nf = 1
   CycleLength = 1
-  NewCycle = FALSE
+  # Print out the function value at the initial point = centre of box
   if (infol > 0){
-    cat(sprintf("Iteration %8i.  New best f = %12.6g \n",nf,fb))
+    if (DoMax) printf = -fb   else   printf = fb
+    cat(sprintf("Iteration %8i.  New best f = %12.6g \n",nf,printf))
   }
 
   while (gogo){
-    oldboxupr = boxupr
-    oldboxlwr = boxlwr
-
     # Find the position of the new test point and its function value
     newx = boxlwr + runif(n)*(boxupr - boxlwr)
     newf = fname(newx, ...)
+    if (DoMax)  newf = -newf
+    if (is.nan(fb) | is.na(fb))  newf = Inf
     nf = nf+1
     CycleLength = CycleLength+1
 
-    # If the new point is better than the control, update the control
     if (newf < fc){  # if 1
+      # If new point better than control, update control & reset sampling box
       fc = newf
       xc = newx
       boxlwr = lwr
       boxupr = upr
     } else {
-      # new point is not better than c, so retain c and shrink the box
+      # new point not better than control so keep control & shrink sampling box
       maxstep = max(abs(xc-newx))
       mincutlength = cutratio*maxstep
+      # shorten the sampling box along each axis for which the control and
+      # new point are at least mincutlength apart.
       for (ii in 1:n) {
         if (abs(xc[ii] - newx[ii]) >= mincutlength) {
           AA = cutposn
-          if (relcut & (maxstep > hmin)){
+          if (relcut & (maxstep > xTol)){
             AA = cutposn*abs(xc[ii] - newx[ii])/maxstep
           }
           # Calculate the cut position and shift the box face inwards
@@ -124,55 +202,90 @@ oscars <- function(fname
       }   # end of for
     }     # end of if 1
 
-    # Check for reset due to max length of cycle reached
+    # Check for reset due to maximum length of cycle reached
     if (CycleLength > maxcycle1 + maxcycle2*CycleNr) {
       NewCycle = TRUE
     }
-    if (max(boxupr-boxlwr) < hmin) {
+    # Check for reset if sampling box too small
+    abs_rel_xTol = pmax(1,abs(xc))
+    if (max(boxupr-boxlwr - xTol*abs_rel_xTol) <= 0) {
       NewCycle = TRUE
     }
 
-    # Perform the SORC strategy and adjust m counters.
+    # Start a new cycle.
     if (NewCycle) {
+        # Reset sampling box to full feasible region.
         boxlwr = lwr
         boxupr = upr
         CycleNr = CycleNr+1
         CycleLength = 0
         NewCycle = FALSE
         if (NextResetBest)   {
-            # Even numbered cycle so initial control point is best point
+            # Odd numbered cycle so initial control point is best point
             xc = xb
             fc = fb
             NextResetBest = FALSE
         } else  {
-            # Odd numbered cycle so initial control point is random
+            # Even numbered cycle so initial control point is random
             xc = lwr + runif(n)*edges
             fc = fname(xc, ...)
+            if (DoMax)  fc = -fc
+            if (is.nan(fc) | is.na(fc))  fc = Inf
             nf = nf + 1
             NextResetBest = TRUE
         }
     } # end of if
 
-
     # Update the best point.
     if (fc < fb) {
       fb = fc
       xb = xc
-      if (infol > 0)  cat(sprintf("Iteration %8i.  New best f = %12.6g \n",nf,fb))
+      if (infol > 0)  {
+        if (DoMax) printf = -fb   else   printf = fb
+        cat(sprintf("New best f =   %12.6g   ",printf))
+        cat(sprintf("at %7i fevals in cycle %5i   \n",nf,CycleNr))
+        }
+      # Check if significant progress has been made.  If so reset fmark
+      if (Use_fTol & (fb <= fmark - fgap))   {
+        fmark = fb
+        nfmark = nf
+        # update f value gap within absolute or relative fTol of fmark
+        fgap = fTol*max(1,abs(fmark))
+      }
     }
 
     #   Check stopping conditions.
     if (nf >= nfmax){
       gogo = FALSE
+      message = "Maximum iterations reached"
     }
+    if (Use_fTol) {
+      if ((fb > fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
+      gogo = FALSE
+      message = "Optimum function value tolerance reached"
+      }
+    }
+
+    # CHRIS, I DON'T SEE THE ADVERTIZED STOPPING RULE ON X. SHOULD IT BE HERE?
+
   } # end of while
+
+  if (DoMax)  fb = -fb
+  if (infol > 0) {
+    cat(sprintf("\n"))
+    if (DoMax) { cat(sprintf("Max ")) } else { cat(sprintf("Min ")) }
+    cat(sprintf("problem.  feval budget = %7i.   \n",nfmax))
+    cat(sprintf("Objective fcn f Tol = %8.4g     ",fTol))
+    cat(sprintf("Decision Var x Tol = %8.4g \n\n",xTol))
+  }
 
   # Put the final objective and decision variable values into a list and return
   solution <- list(par = xb
                  , value = fb
                  , evaluations = nf
                  , convergence = 0
-                 , message = "Maximum iterations reached"
+                 , message = message
+                 , controls = controls
                  )
   return(solution)
 
