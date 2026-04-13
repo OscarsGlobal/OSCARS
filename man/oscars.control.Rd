@@ -37,7 +37,9 @@ for large magnitude decision variables, and an absolute tolerance for
 small ones.   Once the sampling box is less than tolerance
 along all axes, the sequence of nested sample boxes is
 ended.   \code{xTol} must be positive and the algorithm will impose a
-minimum value of 1e-12.   Default is 1e-8.}
+minimum value of 1e-12.   Difference between current and previous best
+known points must be within relative or absolute tolerance of \code{xTol}
+for oscars to halt before the function budget is exhausted.  Default is 1e-8.}
 }
 \value{
 A named list of control parameters for oscars.
@@ -52,7 +54,7 @@ revert to their defaults.  No parameter abbreviations.
 }
 \examples{
 oscars.control()  # default values
-oscars.control(nfmax = 100000) # bump iteration budge
+oscars.control(nfmax = 100000) # bump iteration budget
 oscars.control(xTol = 10*oscars.control()$xTol) # increase xTol
 
 }
