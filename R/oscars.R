@@ -1,37 +1,39 @@
-#' @title OSCARS-II for bound constrained global optimization
-#'
+#' @title OSCARS-II bound constrained global optimization
 #' @description
-#' Performs global optimization of a general black-box function subject
-#' to box constraints using a variant of the OSCARS-II
-#' algorithm (https://doi.org/10.1007/s10898-020-00928-6).
+#' Performs black-box global minimization of a general function subject to 
+#' bounds on the unknown parameters using a variant of the OSCARS-II 
+#' algorithm (https://doi.org/10.1007/s10898-020-00928-6).   Oscars does not
+#' use or even assume the existence of derivatives of the objective function.
+#' Black-box optimization methods for arbitrary functions do not and cannot
+#' provide certificates of optimality if halted after a finite amount of time.
+#' Oscars is a low overhead black-box method for cheap to evaluate functions.
 #'
 #' Oscars is a stochastic direct search method which uses only function values
-#' at selected points.   It generates a finite sequence of nested boxes around
+#' at selected points.   It generates a finite sequence of nested boxes
 #' a control point, and randomly samples each box in turn once.   A new set
 #' of nested boxes is formed if the current set is exhausted or a point better
 #' than the control point is found.   In the latter case the better point
-#' replaces the control.   From time to time the control point is reset to
-#' alternately a random point, or to the best known point.
+#' replaces the control.   In the first instance, the control point is set at 
+#' the centre point of the feasible region given by the lower and upper bounds.  
+#' 
+#' From time to time the control is reset alternately to a random point, or 
+#' to the best known point.   Each reset marks the end of one cycle and the 
+#' start of the next.   All even numbered cycles start with control points
+#' chosen randomly from the feasible region.   All odd numbered cycles (other
+#' than the first) set the control point equal to the best known point.
+#' start at the best known point.   Progress in odd numbered cycles suggests
+#' the algorithm is refining a minimizer, progress in even cycles suggests
+#' it is jumping from one minimizer to another.
 #'
-#' Oscars halts if the function evaluation budget is exhausted, or if both a
-#' significant number of function evaluations have been done, and the change
-#' in the best known value has been less than a given tolerance for the final
-#' function evaluations.
-#'
-#' The method returns the best known point, the function value at that
-#' point, and the number of function evaluations used.
-#'
-#' Please note: Global optimization problems can be arbitrarily hard, and
-#' no method that uses only function values at specified points is guaranteed
-#' to solve all such problems in a finite number of function evaluations.
+#' Oscars either performs a fixed number of function evaluations, or it
+#' halts if progress stalls for a significant period of time.  In both cases it
+#' returns the best known point and the function evaluated at that point.
 #'
 #' @param fname An R function to be minimized. This function must take a vector
 #' of parameter values as its first argument, and return a scalar.  Additional
 #' arguments can be supplied via \code{...}   Missing (NaN and NA) function
 #' values are acceptable as they are replaced with Inf when minimizing
 #' (or -Inf when maximizing).
-#'
-#' @param ... Additional parameters supplied to function \code{fname}.
 #'
 #' @param lwr A vector of lower bounds for the parameters of \code{fname}.
 #' Length is taken to be the number of parameters to minimize over. All bounds
@@ -40,13 +42,15 @@
 #' @param upr A vector of upper bounds for the parameters of \code{fname}. All
 #' bounds must be finite.
 #'
+#' @param ... Additional parameters supplied to function \code{fname}.
+#'
 #' @param controls A list of oscar control parameters, such as iteration
 #' budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
 #' and descriptions.
 #'
-#' @return A list containing the best known set of parameters found, the
-#' of function evaluations used and the minimized function value at the best
-#' known point.   A message indicating why the method halted is also given.
+#' @return A list containing the best known set of parameters found along with
+#' function value at the best known parameters.   The number of function 
+#' evaluations used, and reason for halting are also given.
 #'
 #' @examples
 #' # Branins camel function with global minima of f = -1.0316 at
@@ -104,7 +108,7 @@ oscars <- function(fname
     cat("Control parameters:\n")
     print(do.call(cbind, controls))
   }
-
+  
   # Initialize the method.   n is the number of variables.  xTol is the
   # tolerance on decision variables defining the min sampling box size
   n = length(lwr)
@@ -126,31 +130,41 @@ oscars <- function(fname
   maxcycle1 = 30
   maxcycle2 = 30
   # The algorithm halts due to negligible progress as measured by fTol if the
-  # number of cycles exceeds MinNrCycles (default = 8) and best known absolute
-  # function value agree within an absolute (if best known value < 1) or
+  # number of cycles exceeds MinNrCycles (default = 8) and the best known
+  # function values agree within an absolute (if best known value < 1) or
   # relative error of fTol for the last (stallratio-1) function evaluations.
   stallratio = 3/2
   MinNrCycles = 8
+  convergetest = 1
 
   # Initialize logical algorithm variables.
   gogo = TRUE               # Set to zero to halt the program
   NewCycle = FALSE          # Set to true to start a new cycle.
   NextResetBest = FALSE     # if true next cycle reset is to best point
+  nanDetected = FALSE       # warns if NaN or NA found and infol > 0
   # Use all nfmax function evaluations if objective tolerance is negative
   if (fTol < 0) Use_fTol = FALSE  else  Use_fTol = TRUE
 
   # Set up the bounds on the sampling box.
   boxlwr = lwr
   boxupr = upr
+  
   # get initial function value at centre of the box = start point of cycle 1.
   xb = (lwr+upr)/2
   fb = fname(xb, ...)
   if (DoMax)  fb = -fb
-  if (is.nan(fb) | is.na(fb))  fb = Inf
+  if (is.nan(fb) | is.na(fb)) {
+    fb = Inf
+    nanDetected = TRUE
+  }
   xc = xb
+  xsecondb = xb
   fc = fb
+  fsecondb = Inf
+  
   # Set up the mark to monitor progress of f value for fTol stopping rule
-  fmark = fb
+  # fmark is restricted to a large finite value to avoid "Inf - Inf" issues.
+  fmark = min(10^300,fb)
   nfmark = 1
   fgap = fTol*max(1,abs(fmark))
 
@@ -169,9 +183,19 @@ oscars <- function(fname
     newx = boxlwr + runif(n)*(boxupr - boxlwr)
     newf = fname(newx, ...)
     if (DoMax)  newf = -newf
-    if (is.nan(fb) | is.na(fb))  newf = Inf
+    if (is.nan(fb) | is.na(fb))  {
+      newf = Inf
+      nanDetected = TRUE
+    }
     nf = nf+1
     CycleLength = CycleLength+1
+    
+    # Update second best used for xTol stopping condition.  If newf is new
+    # best xb and xsecondb will be corrected when best is updated.
+    if (newf < fsecondb) {
+      fsecondb = newf
+      xsecondb = newx
+    }
 
     if (newf < fc){  # if 1
       # If new point better than control, update control & reset sampling box
@@ -206,6 +230,7 @@ oscars <- function(fname
     if (CycleLength > maxcycle1 + maxcycle2*CycleNr) {
       NewCycle = TRUE
     }
+    
     # Check for reset if sampling box too small
     abs_rel_xTol = pmax(1,abs(xc))
     if (max(boxupr-boxlwr - xTol*abs_rel_xTol) <= 0) {
@@ -230,7 +255,10 @@ oscars <- function(fname
             xc = lwr + runif(n)*edges
             fc = fname(xc, ...)
             if (DoMax)  fc = -fc
-            if (is.nan(fc) | is.na(fc))  fc = Inf
+            if (is.nan(fc) | is.na(fc))  {
+              fc = Inf
+              nanDetected = TRUE
+            }
             nf = nf + 1
             NextResetBest = TRUE
         }
@@ -238,12 +266,14 @@ oscars <- function(fname
 
     # Update the best point.
     if (fc < fb) {
+      fsecondb = fb
       fb = fc
+      xsecondb = xb
       xb = xc
       if (infol > 0)  {
         if (DoMax) printf = -fb   else   printf = fb
         cat(sprintf("New best f =   %12.6g   ",printf))
-        cat(sprintf("at %7i fevals in cycle %5i   \n",nf,CycleNr))
+        cat(sprintf("at %7i fevals   in cycle %5i   \n",nf,CycleNr))
         }
       # Check if significant progress has been made.  If so reset fmark
       if (Use_fTol & (fb <= fmark - fgap))   {
@@ -258,36 +288,45 @@ oscars <- function(fname
     if (nf >= nfmax){
       gogo = FALSE
       message = "Maximum iterations reached"
+      convergetest = 0
     }
     if (Use_fTol) {
       if ((fb > fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
-      gogo = FALSE
-      message = "Optimum function value tolerance reached"
+        xdiff = abs(xsecondb - xb)
+        if (max(xdiff - xTol*pmax(1,abs(xb))) <= 0) {
+          gogo = FALSE
+          message = "Optimum function value tolerance reached"
+          convergetest = 0
+        }
       }
     }
-
-    # CHRIS, I DON'T SEE THE ADVERTIZED STOPPING RULE ON X. SHOULD IT BE HERE?
-
   } # end of while
 
   if (DoMax)  fb = -fb
   if (infol > 0) {
-    cat(sprintf("\n"))
-    if (DoMax) { cat(sprintf("Max ")) } else { cat(sprintf("Min ")) }
-    cat(sprintf("problem.  feval budget = %7i.   \n",nfmax))
-    cat(sprintf("Objective fcn f Tol = %8.4g     ",fTol))
-    cat(sprintf("Decision Var x Tol = %8.4g \n\n",xTol))
+    if (DoMax) { 
+      cat(sprintf("\n Max ")) 
+    } else { 
+      cat(sprintf("\n Min ")) 
+    }
+    cat(sprintf("problem.  Max feval = %7i, used = %7i.   ",nfmax,nf))
+    cat(sprintf("Obj Tol = %8.4g   Dec Var Tol = %8.4g \n\n",fTol,xTol))
+    if (nanDetected)  {
+      cat(sprintf("Warning: at least one NaN or NA was returned \n\n"))
+    }
   }
 
   # Put the final objective and decision variable values into a list and return
   solution <- list(par = xb
                  , value = fb
                  , evaluations = nf
-                 , convergence = 0
-                 , message = message
+                 , convergence = convergetest
+                 , message
                  , controls = controls
-                 )
+  )
   return(solution)
 
 }   # end of function.
+
+
 
