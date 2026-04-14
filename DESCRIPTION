@@ -10,7 +10,7 @@ Authors@R: c(
     )
 Description: Provides a global bounded minimization of a general function using 
     the OSCARS direct search algoritm. 
-License: Apache + file LICENSE
+License: Apache License (== 2.0) + file LICENSE
 Encoding: UTF-8
 Imports: stats
 LazyData: true
