@@ -21,7 +21,7 @@
 #'
 #' @export
 #'
-summary.oscars <- function(x, ...){
+summary.oscars <- function(object, ...){
 
   if( x$controls$DoMax ){
     upDwn <- "maximum"

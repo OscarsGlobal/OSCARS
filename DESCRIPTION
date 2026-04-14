@@ -1,8 +1,8 @@
-Package: oscarOptim
+Package: OSCARS
 Type: Package
 Title: Global Bounded Minimization Using OSCARS Algorithm
 Version: 0.1.0
-Date: 2026-03-24
+Date: 2026-04-14
 Maintainer: Chris Price <chrisj.price@canterbury.ac.nz>
 Authors@R: c(
       person("Chis", "Price", email="crisj.pice@canterbury.ac.nz", role=c("aut", "cre"))
@@ -10,7 +10,8 @@ Authors@R: c(
     )
 Description: Provides a global bounded minimization of a general function using 
     the OSCARS direct search algoritm. 
-License: MIT + file LICENSE
+License: Apache + file LICENSE
 Encoding: UTF-8
+Imports: stats
 LazyData: true
 RoxygenNote: 7.3.3
