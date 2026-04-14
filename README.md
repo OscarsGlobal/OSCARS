@@ -1,7 +1,7 @@
 # OSCARS-II Global Optimization
 
-An R pacage the performs black-box global minimization of a general function 
-subject to bounds on the unknown parameters using a variant of the OSCARS-II 
+An R package that performs black-box global minimization of a general function 
+subject to finite bounds on the unknown parameters using a variant of the OSCARS-II 
 algorithm (https://doi.org/10.1007/s10898-020-00928-6).  
 
 ## Description
@@ -10,8 +10,10 @@ use or even assume the existence of derivatives of the objective function.
 
 Oscars is a stochastic direct search method which uses only function values 
 at selected points. Oscars is a low overhead black-box method that is 
-particularly suited for functions that are cheap to evaluate.   
-It generates a finite sequence of nested boxes a control point, and randomly 
+particularly suited for functions that are cheap to evaluate.   It uses
+a control point to direct attention to parts of the search space it is preferring
+at that time.
+It generates a finite sequence of nested boxes around a control point, and randomly 
 samples each box in turn once.   A new set of nested boxes is formed if 
 the current set is exhausted or a point better than the control point is found.
 In the latter case the better point replaces the control.   In the first 
@@ -59,9 +61,9 @@ out <- oscars(camel, lwr = c(-5,-5), upr = c(5,5))
 Result is
 ``` r
 > out
-Function minimum at -0.0898420652018077, 0.712656434215101
+Minimum value found at -0.0898420652018077, 0.712656434215101
 > summary(out)
-Function minimum of -1.03162845348986 achieved in 1332 evaluations at 
+Minimum value -1.03162845348986 achieved in 1332 evaluations at 
  -0.0898420652018077, 0.712656434215101 
  Evaluations stopped because Optimum function value tolerance reached. 
 ```
