@@ -252,7 +252,7 @@ oscars <- function(fname
             NextResetBest = FALSE
         } else  {
             # Even numbered cycle so initial control point is random
-            xc = lwr + runif(n)*edges
+            xc = lwr + stats::runif(n)*edges
             fc = fname(xc, ...)
             if (DoMax)  fc = -fc
             if (is.nan(fc) | is.na(fc))  {

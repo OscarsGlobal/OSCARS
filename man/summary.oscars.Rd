@@ -7,6 +7,8 @@
 \method{summary}{oscars}(object, ...)
 }
 \arguments{
+\item{object}{An 'oscars' object returned by \code{oscars}.}
+
 \item{...}{Included for compatibility with other print methods.
 Ignored here.}
 }

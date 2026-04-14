@@ -28,12 +28,12 @@ and descriptions.}
 }
 \value{
 A list containing the best known set of parameters found along with
-function value at the best known parameters.   The number of function 
+function value at the best known parameters.   The number of function
 evaluations used, and reason for halting are also given.
 }
 \description{
-Performs black-box global minimization of a general function subject to 
-bounds on the unknown parameters using a variant of the OSCARS-II 
+Performs black-box global minimization of a general function subject to
+bounds on the unknown parameters using a variant of the OSCARS-II
 algorithm (https://doi.org/10.1007/s10898-020-00928-6).   Oscars does not
 use or even assume the existence of derivatives of the objective function.
 Black-box optimization methods for arbitrary functions do not and cannot
@@ -45,11 +45,11 @@ at selected points.   It generates a finite sequence of nested boxes
 a control point, and randomly samples each box in turn once.   A new set
 of nested boxes is formed if the current set is exhausted or a point better
 than the control point is found.   In the latter case the better point
-replaces the control.   In the first instance, the control point is set at 
-the centre point of the feasible region given by the lower and upper bounds.  
+replaces the control.   In the first instance, the control point is set at
+the centre point of the feasible region given by the lower and upper bounds.
 
-From time to time the control is reset alternately to a random point, or 
-to the best known point.   Each reset marks the end of one cycle and the 
+From time to time the control is reset alternately to a random point, or
+to the best known point.   Each reset marks the end of one cycle and the
 start of the next.   All even numbered cycles start with control points
 chosen randomly from the feasible region.   All odd numbered cycles (other
 than the first) set the control point equal to the best known point.
