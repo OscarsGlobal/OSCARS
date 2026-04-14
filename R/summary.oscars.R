@@ -4,6 +4,8 @@
 #'
 #' @inheritParams print.oscars
 #'
+#' @param object An 'oscars' object returned by \code{oscars}.
+#'
 #' @return NULL
 #'
 #' @seealso \code{\link{oscars}}
