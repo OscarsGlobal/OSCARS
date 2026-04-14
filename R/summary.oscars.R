@@ -4,6 +4,8 @@
 #'
 #' @inheritParams print.oscars
 #'
+#' @param object An 'oscars' object returned by \code{oscars}.
+#'
 #' @return NULL
 #'
 #' @seealso \code{\link{oscars}}
@@ -23,23 +25,23 @@
 #'
 summary.oscars <- function(object, ...){
 
-  if( x$controls$DoMax ){
+  if( object$controls$DoMax ){
     upDwn <- "maximum"
   } else {
     upDwn <- "minimum"
   }
-  if( x$convergence == 0 ){
+  if( object$convergence == 0 ){
     mess1 <- paste0("Function ", upDwn
-                 , " of ", x$value
-                 , " achieved in ", x$evaluations, " evaluations"
-                 , " at ", paste(x$par, collapse = ", "))
-    mess2 <- paste0("Evaluations stopped because ", x$message, ".")
+                 , " of ", object$value
+                 , " achieved in ", object$evaluations, " evaluations"
+                 , " at ", paste(object$par, collapse = ", "))
+    mess2 <- paste0("Evaluations stopped because ", object$message, ".")
   } else {
     mess1 <- paste0("FAILURE: Function ", upDwn, " not found in "
-                    , x$evaluations, "evaluations with")
-    mess2 <- paste0("functional tollerance stopping rule of ", x$controls$fTol
+                    , object$evaluations, "evaluations with")
+    mess2 <- paste0("functional tollerance stopping rule of ", object$controls$fTol
                   , " and parameter tollerange stopping rule of"
-                  , x$controls$xTol)
+                  , object$controls$xTol)
   }
   mess <- strwrap( c(mess1, mess2) )
   cat(paste(mess, "\n"))

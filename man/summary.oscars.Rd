@@ -4,10 +4,10 @@
 \alias{summary.oscars}
 \title{Summary method for 'oscars' objects}
 \usage{
-\method{summary}{oscars}(x, ...)
+\method{summary}{oscars}(object, ...)
 }
 \arguments{
-\item{x}{An 'oscars' object returned by \code{oscars}.}
+\item{object}{An 'oscars' object returned by \code{oscars}.}
 
 \item{...}{Included for compatibility with other print methods.
 Ignored here.}
