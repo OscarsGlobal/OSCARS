@@ -77,7 +77,7 @@ the development release with the following commands:
     CRAN. In the R terminal, issue…
 
 ``` r
-install.packages("oscarsGlobal")
+install.packages("OSCARS")
 ```
 
 2.  ***Development version***: `oscarsGlobal` is under active development,
@@ -85,13 +85,13 @@ install.packages("oscarsGlobal")
     official releases. Inspect commit messages for commits following the
     most recent release for a description of the patches. Install the
     development version from
-    [GitHub](https://github.com/OscarsGlobal/oscars.bound.constrained) using:
+    [GitHub](https://github.com/OscarsGlobal/OSCARS) using:
 
 ``` r
 if( !require("devtools") ){
   install.packages("devtools")
 }
-devtools::install_github("OscarsGlobal/oscars.bound.constrained")
+devtools::install_github("OscarsGlobal/OSCARS")
 ```
 
 
