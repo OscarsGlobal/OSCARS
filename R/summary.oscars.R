@@ -2,7 +2,9 @@
 #'
 #' @description Prints a summary of 'oscars' objects.
 #'
-#' @inheritParams print.oscars
+#' @param object An 'oscars' object returned by \code{oscars}.
+#'
+#' @param ... Ignored here.  Included for use by other methods.
 #'
 #' @return NULL
 #'

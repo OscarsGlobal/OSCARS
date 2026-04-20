@@ -9,8 +9,7 @@
 \arguments{
 \item{object}{An 'oscars' object returned by \code{oscars}.}
 
-\item{...}{Included for compatibility with other print methods.
-Ignored here.}
+\item{...}{Ignored here.  Included for use by other methods.}
 }
 \description{
 Prints a summary of 'oscars' objects.
