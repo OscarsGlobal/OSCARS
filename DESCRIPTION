@@ -1,8 +1,7 @@
 Package: OSCARS
 Type: Package
 Title: Global Bounded Minimization Using OSCARS Algorithm
-Version: 0.1.0
-Date: 2026-04-14
+Version: 0.1.1
 Maintainer: Chris Price <chrisj.price@canterbury.ac.nz>
 Authors@R: c(
       person("Chis", "Price", email="crisj.pice@canterbury.ac.nz", role=c("aut", "cre"))
