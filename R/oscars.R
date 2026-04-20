@@ -1,7 +1,7 @@
 #' @title OSCARS-II bound constrained global optimization
 #' @description
-#' Performs black-box global minimization of a general function subject to
-#' bounds on the unknown parameters using a variant of the OSCARS-II
+#' Performs black-box global minimization of a general function subject to 
+#' bounds on the unknown parameters using a variant of the OSCARS-II 
 #' algorithm (https://doi.org/10.1007/s10898-020-00928-6).   Oscars does not
 #' use or even assume the existence of derivatives of the objective function.
 #' Black-box optimization methods for arbitrary functions do not and cannot
@@ -13,11 +13,11 @@
 #' a control point, and randomly samples each box in turn once.   A new set
 #' of nested boxes is formed if the current set is exhausted or a point better
 #' than the control point is found.   In the latter case the better point
-#' replaces the control.   In the first instance, the control point is set at
-#' the centre point of the feasible region given by the lower and upper bounds.
-#'
-#' From time to time the control is reset alternately to a random point, or
-#' to the best known point.   Each reset marks the end of one cycle and the
+#' replaces the control.   In the first instance, the control point is set at 
+#' the centre point of the feasible region given by the lower and upper bounds.  
+#' 
+#' From time to time the control is reset alternately to a random point, or 
+#' to the best known point.   Each reset marks the end of one cycle and the 
 #' start of the next.   All even numbered cycles start with control points
 #' chosen randomly from the feasible region.   All odd numbered cycles (other
 #' than the first) set the control point equal to the best known point.
@@ -49,7 +49,7 @@
 #' and descriptions.
 #'
 #' @return A list containing the best known set of parameters found along with
-#' function value at the best known parameters.   The number of function
+#' function value at the best known parameters.   The number of function 
 #' evaluations used, and reason for halting are also given.
 #'
 #' @examples
@@ -108,7 +108,7 @@ oscars <- function(fname
     cat("Control parameters:\n")
     print(do.call(cbind, controls))
   }
-
+  
   # Initialize the method.   n is the number of variables.  xTol is the
   # tolerance on decision variables defining the min sampling box size
   n = length(lwr)
@@ -148,7 +148,7 @@ oscars <- function(fname
   # Set up the bounds on the sampling box.
   boxlwr = lwr
   boxupr = upr
-
+  
   # get initial function value at centre of the box = start point of cycle 1.
   xb = (lwr+upr)/2
   fb = fname(xb, ...)
@@ -161,7 +161,7 @@ oscars <- function(fname
   xsecondb = xb
   fc = fb
   fsecondb = Inf
-
+  
   # Set up the mark to monitor progress of f value for fTol stopping rule
   # fmark is restricted to a large finite value to avoid "Inf - Inf" issues.
   fmark = min(10^300,fb)
@@ -189,7 +189,7 @@ oscars <- function(fname
     }
     nf = nf+1
     CycleLength = CycleLength+1
-
+    
     # Update second best used for xTol stopping condition.  If newf is new
     # best xb and xsecondb will be corrected when best is updated.
     if (newf < fsecondb) {
@@ -230,7 +230,7 @@ oscars <- function(fname
     if (CycleLength > maxcycle1 + maxcycle2*CycleNr) {
       NewCycle = TRUE
     }
-
+    
     # Check for reset if sampling box too small
     abs_rel_xTol = pmax(1,abs(xc))
     if (max(boxupr-boxlwr - xTol*abs_rel_xTol) <= 0) {
@@ -304,10 +304,10 @@ oscars <- function(fname
 
   if (DoMax)  fb = -fb
   if (infol > 0) {
-    if (DoMax) {
-      cat(sprintf("\n Max "))
-    } else {
-      cat(sprintf("\n Min "))
+    if (DoMax) { 
+      cat(sprintf("\n Max ")) 
+    } else { 
+      cat(sprintf("\n Min ")) 
     }
     cat(sprintf("problem.  Max feval = %7i, used = %7i.   ",nfmax,nf))
     cat(sprintf("Obj Tol = %8.4g   Dec Var Tol = %8.4g \n\n",fTol,xTol))

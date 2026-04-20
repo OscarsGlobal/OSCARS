@@ -27,14 +27,14 @@
 print.oscars <- function(x, ...){
 
   if( x$controls$DoMax ){
-    upDwn <- "maximum"
+    upDwn <- "Maximum"
   } else {
-    upDwn <- "minimum"
+    upDwn <- "Minimum"
   }
   if( x$convergence == 0 ){
-    mess <- paste0("Function ", upDwn, " at ", paste(x$par, collapse = ", "))
+    mess <- paste0(upDwn, " value found at ", paste(x$par, collapse = ", "))
   } else {
-    mess <- paste0("Function ", upDwn, " not found in ", x$evaluations, "evaluations.")
+    mess <- paste0(upDwn, " not found in ", x$evaluations, "evaluations.")
   }
   mess <- strwrap( mess )
   cat(paste(mess, "\n"))
