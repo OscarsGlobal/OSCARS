@@ -21,25 +21,25 @@
 #'
 #' @export
 #'
-summary.oscars <- function(x, ...){
+summary.oscars <- function(object, ...){
 
-  if( x$controls$DoMax ){
+  if( object$controls$DoMax ){
     upDwn <- "Maximum"
   } else {
     upDwn <- "Minimum"
   }
-  if( x$convergence == 0 ){
+  if( object$convergence == 0 ){
     mess1 <- paste0(upDwn
-                 , " value of ", x$value
-                 , " achieved in ", x$evaluations, " evaluations"
-                 , " at ", paste(x$par, collapse = ", "))
-    mess2 <- paste0("Evaluations stopped because ", x$message, ".")
+                 , " value of ", object$value
+                 , " achieved in ", object$evaluations, " evaluations"
+                 , " at ", paste(object$par, collapse = ", "))
+    mess2 <- paste0("Evaluations stopped because ", object$message, ".")
   } else {
     mess1 <- paste0("FAILURE: Function ", upDwn, " not found in "
-                    , x$evaluations, "evaluations with")
-    mess2 <- paste0("functional tolerance stopping rule of ", x$controls$fTol
+                    , object$evaluations, "evaluations with")
+    mess2 <- paste0("functional tolerance stopping rule of ", object$controls$fTol
                   , " and parameter tolerance stopping rule of"
-                  , x$controls$xTol)
+                  , object$controls$xTol)
   }
   mess <- strwrap( c(mess1, mess2) )
   cat(paste(mess, "\n"))
