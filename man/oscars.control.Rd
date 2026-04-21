@@ -6,7 +6,7 @@
 \usage{
 oscars.control(
   nfmax = 50000,
-  infol = 1,
+  infol = 2,
   DoMax = FALSE,
   fTol = 1e-06,
   xTol = 1e-08
@@ -17,7 +17,10 @@ oscars.control(
 Default for \code{nfmax} is 50000.}
 
 \item{infol}{Verbosity during iterations. If \code{infol} is positive,
-each new best function value is printed.   Default is 1.}
+some status messages and the final function value will be printed.  If
+\code{infol} is greater than 1, each new best function value is printed
+along with current cycle number and function evaluations used.   The change
+in f (df) and length of step taken (dpar) are also printed.  Default is 2.}
 
 \item{DoMax}{logical variable set to TRUE if the objective is
 to be maximized.   Default is FALSE.}
