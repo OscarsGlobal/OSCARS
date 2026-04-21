@@ -4,7 +4,7 @@ Title: Global Bounded Minimization Using OSCARS Algorithm
 Version: 0.1.1
 Maintainer: Chris Price <chrisj.price@canterbury.ac.nz>
 Authors@R: c(
-      person("Chis", "Price", email="crisj.pice@canterbury.ac.nz", role=c("aut", "cre"))
+      person("Chris", "Price", email="chrisj.pice@canterbury.ac.nz", role=c("aut", "cre"))
     , person("Trent", "McDonald", role=c("aut","ctb"), email="trent@mcdonalddatasciences.com", comment="R packaging")
     )
 Description: Provides a global bounded minimization of a general function using 
