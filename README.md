@@ -5,29 +5,29 @@ subject to finite bounds on the unknown parameters using a variant of the OSCARS
 algorithm (https://doi.org/10.1007/s10898-020-00928-6).  
 
 ## Description
-Oscars is a global minimization (or maximization) routine that does not 
-use or even assume the existence of derivatives of the objective function. 
+Oscars performs black-box minimization (or maximization) of a general function 
+subject to bounds on the unknown parameters.   If all bounds
+are finite, oscars acts as a global optimization algorithm.  It has been
+adapted to handle infinite upper and lower bounds, in which case the method
+has the characteristics of a local method for non smooth problems.  Oscars
+does not use or assume the existence of derivatives of the objective
+function.  It is a low overhead method for cheaply evaluated black-box
+functions.
 
-Oscars is a stochastic direct search method which uses only function values 
-at selected points. Oscars is a low overhead black-box method that is 
-particularly suited for functions that are cheap to evaluate.   It uses
-a control point to direct attention to parts of the search space it is preferring
-at that time.
-It generates a finite sequence of nested boxes around a control point, and randomly 
-samples each box in turn once.   A new set of nested boxes is formed if 
-the current set is exhausted or a point better than the control point is found.
-In the latter case the better point replaces the control.   In the first 
-instance, the control point is set at the centre point of the feasible region 
-given by the lower and upper bounds.
+Oscars is a stochastic direct search method which uses only function values
+at selected points.   It generates a finite sequence of nested boxes around
+a control point, and randomly samples each box once, in turn.   A new set
+of nested boxes is formed if the current set is exhausted or a point better
+than the control point is found.   In the latter case the better point
+replaces the control.   Initially the control point is set to the better
+of an internal initial point and a user supplied start point (if given).
 
 From time to time the control is reset alternately to a random point, or
 to the best known point.   Each reset marks the end of one cycle and the
 start of the next.   All even numbered cycles start with control points
 chosen randomly from the feasible region.   All odd numbered cycles (other
 than the first) set the control point equal to the best known point.
-start at the best known point.   Progress in odd numbered cycles suggests
-the algorithm is refining a minimizer, progress in even cycles suggests
-it is jumping from one minimizer to another.
+start at the best known point.   
 
 Oscars either performs a fixed number of function evaluations, or it
 halts if progress stalls for a significant period of time.  In both cases it
@@ -45,7 +45,9 @@ any other (fixed) parameters that are needed in the objective function.
 
 This is one of the examples in the R documentation files.  It minimizes the 
 Branins camel function, which has a minima of *f* = -1.0316 at
-(0.0898,0.7127) and (0.0898,-0.7127) with four other local minima. 
+(0.0898,0.7127) and (0.0898,-0.7127) with four other local minima.  Here n is the
+number of parameters to be minimized with respect to, and lwr and upr are 
+the vectors of bounds for the problem.
 
 ``` r
 # the camel function
@@ -55,7 +57,7 @@ camel <- function(par) {
    f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
    return(f) }
 # Minimize in box (-5,5)
-out <- oscars(camel, lwr = c(-5,-5), upr = c(5,5))
+out <- oscars(camel, n = 2, lwr = c(-5,-5), upr = c(5,5))
 ```
 
 Result is
