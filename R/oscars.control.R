@@ -46,7 +46,7 @@
 #' @export
 oscars.control <- function(
     nfmax = 50000
-    , infol = 1
+    , infol = 2
     , DoMax = FALSE
     , fTol  = 1e-6
     , xTol  = 1e-8
