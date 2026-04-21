@@ -22,7 +22,7 @@ camel <- function(par) {
   y = par[2]
   f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
   return(f) }
-out <- oscars(camel, lwr = c(-5,-5), upr = c(5,5))
+out <- oscars(camel, n = 2, lwr = c(-5,-5), upr = c(5,5))
 summary(out)
 
 }
