@@ -27,7 +27,6 @@ to the best known point.   Each reset marks the end of one cycle and the
 start of the next.   All even numbered cycles start with control points
 chosen randomly from the feasible region.   All odd numbered cycles (other
 than the first) set the control point equal to the best known point.
-start at the best known point.   
 
 Oscars either performs a fixed number of function evaluations, or it
 halts if progress stalls for a significant period of time.  In both cases it
