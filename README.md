@@ -39,12 +39,13 @@ regular R function
 must take a vector of parameter values as its first argument, and return a scalar.
 Additional arguments, beyond the first, can be included. 
 The function may return missing (NaN and NA) values. Once the objective function 
-is defined, you supply it to `oscars` where you also specify parameter bounds and 
+is defined, you supply it to `oscars` where you also specify the number of 
+parameters, parameter bounds and 
 any other (fixed) parameters that are needed in the objective function. 
 
-This is one of the examples in the R documentation files.  It minimizes the 
-Branins camel function, which has a minima of *f* = -1.0316 at
-(0.0898,0.7127) and (0.0898,-0.7127) with four other local minima.  Here n is the
+This is one of the examples in the R documentation files.  It minimizes 
+Branin's camel function, which has a global minimum of *f* = -1.0316 at
+(0.0898,0.7127) and (0.0898,-0.7127) with four other local minimizers.  Here n is the
 number of parameters to be minimized with respect to, and lwr and upr are 
 the vectors of bounds for the problem.
 
