@@ -474,11 +474,11 @@ oscars <- function(fname
   if (DoMax)  fb = -fb
   if (infol > 0) {
     if (DoMax) {
-      cat(sprintf("\n Max "))
+      cat(sprintf("\n Max f = "))
     } else {
-      cat(sprintf("\n Min "))
+      cat(sprintf("\n Min f = "))
     }
-    cat(sprintf("problem.  Max feval = %7i, used = %7i.   ",nfmax,nf))
+    cat(sprintf("%12.6g    Max feval = %7i, used = %7i.   ",fb,nfmax,nf))
     cat(sprintf("Obj Tol = %8.4g   Dec Var Tol = %8.4g \n\n",fTol,xTol))
     if (nanDetected)  {
       cat(sprintf("Note: At least one NaN or NA was returned \n\n"))
