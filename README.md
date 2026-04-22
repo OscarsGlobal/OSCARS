@@ -82,8 +82,8 @@ the development release with the following commands:
 install.packages("OSCARS")
 ```
 
-2.  ***Development version***: `oscarsGlobal` is under active development,
-    and the ‘development’ version often contains patches between
+2.  ***Development version***: `oscarsGlobal` is under active development.
+    The development version often contains patches between
     official releases. Inspect commit messages for commits following the
     most recent release for a description of the patches. Install the
     development version from
