@@ -4,7 +4,7 @@
 \alias{oscars}
 \title{OSCARS-II bound constrained global optimization}
 \usage{
-oscars(fname, lwr, upr, ..., controls = oscars.control())
+oscars(fname, n, lwr, upr, ..., start = NULL, controls = oscars.control())
 }
 \arguments{
 \item{fname}{An R function to be minimized. This function must take a vector
@@ -21,7 +21,7 @@ lower bounds.  Lower bounds of minus infinity are acceptable.  In order to
 maximize oscars effectiveness, it is recommended that the gap between
 upper and lower bounds not be unnecessarily wide.}
 
-\item{upr}{A vector of upper bounds for the parameters of \code{fname}. 
+\item{upr}{A vector of upper bounds for the parameters of \code{fname}.
 If a single value \code{upr} is supplied, this value will be used for all
 upper bounds.   Upper bounds of infinity are acceptable.   It is suggested
 that Inf be used for parameters that are unbounded above rather than a
@@ -49,7 +49,7 @@ and descriptions.}
 }
 \value{
 A list containing the best known set of parameters found along with
-function value at the best known parameters.   The number of function 
+function value at the best known parameters.   The number of function
 evaluations used, and reason for halting are also given.
 }
 \description{

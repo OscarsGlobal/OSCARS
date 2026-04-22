@@ -15,8 +15,8 @@
 Prints a summary of 'oscars' objects.
 }
 \examples{
-# Branins camel function with global minima of f = -1.0316 at
-# (0.0898,0.7127) and (0.0898,-0.7127) with four other local minima
+# Branins camel function with global minimum of f = -1.0316 at
+# (0.0898,0.7127) and (0.0898,-0.7127) with four other local minimizers
 camel <- function(par) {
   x = par[1]
   y = par[2]
