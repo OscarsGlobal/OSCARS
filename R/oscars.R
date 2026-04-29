@@ -2,7 +2,8 @@
 #' @description
 #' Performs black-box optimization of a general function subject to
 #' bounds on the unknown parameters using a variant of the OSCARS-II
-#' algorithm (https://doi.org/10.1007/s10898-020-00928-6).   If all bounds
+#' algorithm (Price, Reale and Robertson (2021) <doi.org/10.1007/s10898-020-00928-6>).
+#' If all bounds
 #' are finite, Oscars acts as a global optimization algorithm.  It has been
 #' adapted to handle infinite upper and lower bounds, in which case the method
 #' has the characteristics of a local method for nonsmooth problems.  Oscars
