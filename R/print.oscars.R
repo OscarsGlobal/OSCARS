@@ -1,13 +1,15 @@
 #' @title Print method for 'oscars' objects
 #'
-#' @description Prints an 'oscars' object.
+#' @description Prints an 'oscars' object showing minimized (or maximized)
+#' parameters and the optimization message.
 #'
 #' @param x An 'oscars' object returned by \code{oscars}.
 #'
 #' @param \dots Included for compatibility with other print methods.
 #' Ignored here.
 #'
-#' @return NULL
+#' @return No return value, called for side effects. Technically, \code{NULL}
+#' is returned invisibly.
 #'
 #' @seealso \code{\link{oscars}}
 #'
