@@ -19,9 +19,13 @@ at selected points.   It generates a finite sequence of nested boxes around
 a control point, and randomly samples each box once, in turn.   A new set
 of nested boxes is formed if the current set is exhausted or a point better
 than the control point is found.   In the latter case the better point
-replaces the control.   Initially the control point is set to the better
-of an internal initial point and a user supplied start point (if given).
+replaces the control.   The name 'Oscars' is a contraction of One Side Cut 
+Accelerated Random Search, where the "one side cut" refers to how the 
+nested boxes are generated.   The original accelerated random search method
+of Radulovic et al. used a different strategy to generate the nested boxes.
 
+Initially the control point is set to the better
+of an internal initial point and a user supplied start point (if given).
 From time to time the control is reset alternately to a random point, or
 to the best known point.   Each reset marks the end of one cycle and the
 start of the next.   All even numbered cycles start with control points
