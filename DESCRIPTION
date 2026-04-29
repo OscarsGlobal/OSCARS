@@ -1,14 +1,20 @@
 Package: OSCARS
 Type: Package
-Title: Global Bounded Minimization Using OSCARS Algorithm
+Title: Global Bounded Optimization by the OSCARS-II Algorithm
 Version: 0.1.2
 Maintainer: Chris Price <chrisj.price@canterbury.ac.nz>
 Authors@R: c(
       person("Chris", "Price", email="chrisj.price@canterbury.ac.nz", role=c("aut", "cre"))
     , person("Trent", "McDonald", role=c("aut","ctb"), email="trent@mcdonalddatasciences.com", comment="R packaging")
     )
-Description: Provides a global bounded minimization of a general function using 
-    the OSCARS direct search algorithm. 
+Description: A collection of general optimization routines based on varients of 
+    the O<word> S<word> C<word> A<word> R<word> S<word> (OSCARS-II) algorithm 
+    (Price et al., 2020, <doi:10.1007/s10898-020-00928-6>). The main function
+    , 'oscars()', performs black-box optimization of a general (nonsmooth or 
+    discontinuous) function subject to box constraints. If box boundaries are 
+    finite, optimization is global. The main method implements a stochastic direct 
+    search method and is derivative free. Testing shows the OSCARS-II algorithm 
+    finds extrema in fewer iterations than other global derivative-free methods.
 License: Apache License (>= 2)
 Encoding: UTF-8
 Imports: stats
