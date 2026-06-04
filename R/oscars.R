@@ -458,7 +458,7 @@ oscars <- function(fname
     if (nf >= nfmax){
       gogo = FALSE
       message = "Maximum iterations reached"
-      convergetest = 0
+      convergetest = 1
     }
     if (Use_fTol) {
       if ((fb > fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
