@@ -73,8 +73,8 @@
 #' and descriptions.
 #'
 #' @return A list containing the best known set of parameters found along with
-#' function value at the best known parameters.   The number of function
-#' evaluations used, and reason for halting are also given.
+#' function value at the best known parameters.   The numbers of function
+#' evaluations and cycles used, and reason for halting are also given.
 #'
 #' @examples
 #' # Camel function with global minima of f = -1.0316 at
@@ -185,6 +185,7 @@ oscars <- function(fname
                      , value = NULL
                      , evaluations = 0
                      , convergence = 2
+                     , cycles = 0
                      , message = "ALERT: Run aborted due to inconsistent bounds."
                      , controls = controls
     )
@@ -490,6 +491,7 @@ oscars <- function(fname
   solution <- list(par = xb
                  , value = fb
                  , evaluations = nf
+                 , cycles = CycleNr
                  , convergence = convergetest
                  , message = message
                  , controls = controls
