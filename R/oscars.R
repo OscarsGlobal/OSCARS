@@ -45,7 +45,6 @@
 #' maximize oscars effectiveness, it is recommended that the gap between
 #' upper and lower bounds not be unnecessarily wide.
 #'
-#'
 #' @param upr A vector of upper bounds for the parameters of \code{fname}.
 #' If a single value \code{upr} is supplied, this value will be used for all
 #' upper bounds.   Upper bounds of infinity are acceptable.   It is suggested
@@ -72,9 +71,18 @@
 #' budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
 #' and descriptions.
 #'
-#' @return A list containing the best known set of parameters found along with
-#' function value at the best known parameters.   The numbers of function
-#' evaluations and cycles used, and reason for halting are also given.
+#' @return A list containing results of the optimization.  This list consists of the 
+#' following components: 
+#'   \itemize{
+#'      \item \code{par}: vector containing the best known parameters
+#'      \item \code{value}: The minimized (or maximized) function value
+#'      \item \code{evaluations}: The number of function evaluations used
+#'      \item \code{cycles}: The number of cycles used
+#'      \item \code{convergence}: 0 if the function and parameter tolerances have been reached;  
+#'       1 if tolerances have not been reached but function evaluation budget has been exhausted;
+#'       2 if bounds are inconsistent.
+#'      \item \code{message}: A text string explaining the value in \code{convergence}.
+#'      \item \code{controls}: The values of the controls provided to oscars
 #'
 #' @examples
 #' # Camel function with global minima of f = -1.0316 at
@@ -184,8 +192,8 @@ oscars <- function(fname
     solution <- list(par = NULL
                      , value = NULL
                      , evaluations = 0
-                     , convergence = 2
                      , cycles = 0
+                     , convergence = 2
                      , message = "ALERT: Run aborted due to inconsistent bounds."
                      , controls = controls
     )
