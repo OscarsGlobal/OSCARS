@@ -12,8 +12,13 @@
 \item{\dots}{Included for compatibility with other print methods.
 Ignored here.}
 }
+\value{
+No return value, called for side effects. Technically, \code{NULL}
+is returned invisibly.
+}
 \description{
-Prints an 'oscars' object.
+Prints an 'oscars' object showing minimized (or maximized)
+parameters and the optimization message.
 }
 \examples{
 # Branins camel function with global minimum of f = -1.0316 at

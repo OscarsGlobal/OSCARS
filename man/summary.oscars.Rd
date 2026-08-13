@@ -11,8 +11,13 @@
 
 \item{...}{Ignored here.  Included for use by other methods.}
 }
+\value{
+No return value, called for side effects. Technically, \code{NULL}
+is returned invisibly.
+}
 \description{
-Prints a summary of 'oscars' objects.
+Summarizes an 'oscars' object. Shows an 'oscars' object's
+minimized (or maximized) parameters, optimization message, iterations, etc..
 }
 \examples{
 # Branins camel function with global minimum of f = -1.0316 at
