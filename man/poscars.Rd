@@ -12,7 +12,7 @@ poscars(
   ...,
   start = NULL,
   controls = oscars.control(),
-  ncores = max(1, parallel::detectCores() - 1),
+  ncores = 2,
   divide.budget = TRUE,
   seed = NULL,
   cl = NULL
@@ -28,44 +28,59 @@ in separate R processes, any helper objects or functions that \code{fname}
 references from the global environment should either be defined inside
 \code{fname} or passed to it through \code{...} (see \code{Details}).}
 
-\item{n}{The number of parameters with which \code{fname} is optimized.}
+\item{n}{The number of parameters with which \code{fname} is minimized.}
 
 \item{lwr}{A vector of lower bounds for the parameters of \code{fname}.
-If a single value is supplied it is used for all lower bounds.  Lower bounds
-of \code{-Inf} are acceptable.}
+If a single value \code{lwr} is supplied, this value will be used for all
+lower bounds.  Lower bounds of minus infinity are acceptable.  In order to
+maximize oscars effectiveness, it is recommended that the gap between
+upper and lower bounds not be unnecessarily wide.}
 
 \item{upr}{A vector of upper bounds for the parameters of \code{fname}.
-If a single value is supplied it is used for all upper bounds.  Upper bounds
-of \code{Inf} are acceptable and signal a local rather than global search.}
+If a single value \code{upr} is supplied, this value will be used for all
+upper bounds.   Upper bounds of infinity are acceptable.   It is suggested
+that Inf be used for parameters that are unbounded above rather than a
+very large finite number as this signals the method to operate as a local
+search rather than attempting to cover all values between the bounds.}
 
 \item{...}{Additional parameters supplied to function \code{fname}.}
 
-\item{start}{An optional start point for the algorithm, passed unchanged to
-each worker's \code{\link{oscars}} call.  If a single value is provided it is
-used for all dimensions.  Default is \code{NULL}.}
+\item{start}{This is an optional start point for the algorithm.  It allows
+the user to direct the method to a region the user considers promising.
+If the start point is infeasible (i.e. violates some bounds) the closest
+feasible point to it is used.   If a single
+value is provided, it is used for all dimensions.  Default is null.
 
-\item{controls}{A list of OSCARS control parameters, such as the iteration
-budget and tolerances. See \code{\link{oscars.control}} for the full list and
-descriptions.  When \code{divide.budget = TRUE} the \code{nfmax} element is
-split among the workers internally; the \code{controls} you pass in are not
-modified.}
+The algorithm also generates an internal initial point as follows.  When
+all bounds are finite, this is the centre point of the box.   Otherwise each
+parameter is started at the average of its bounds when both are finite;
+if one bound is finite, it uses a feasible value near that bound; otherwise
+it uses the user supplied start value (if one is given) for that parameter,
+or zero otherwise.}
 
-\item{ncores}{The number of processor cores (parallel worker processes) to
-use.  Must be a positive integer.  If \code{ncores <= 1} the optimization is
+\item{controls}{A list of oscar control parameters, such as iteration
+budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
+and descriptions.}
+
+\item{ncores}{The number of processor cores (parallel workers) to
+use.  Must be a positive integer, or \code{Inf} to use every core detected
+on the machine.  If \code{ncores <= 1} the optimization is
 run serially by calling \code{\link{oscars}} directly (no cluster is
 created).  If \code{ncores} exceeds the number of cores detected on the
-machine it is reduced to that number with a warning.  Default is
-\code{max(1, parallel::detectCores() - 1)}, leaving one core free.}
+machine it is reduced to that number and a message is printed.  Default is
+\code{2} per CRAN policies.}
 
 \item{divide.budget}{Logical.  If \code{TRUE} (the default) the total
 evaluation budget \code{controls$nfmax} is divided among the \code{ncores}
-workers, so each worker performs about \code{nfmax / ncores} evaluations. If
-\code{FALSE}, every worker is given the full \code{nfmax} budge.}
+workers.  In this case, each worker performs a max of
+\code{ceiling(nfmax / ncores)} evaluations. If
+\code{FALSE}, every worker is given the full \code{nfmax} budget.}
 
 \item{seed}{An optional integer used to seed the parallel random number
-streams, making the whole parallel run reproducible.  Each worker
-still receives its own independent
-stream.  Default is \code{NULL}, which draws non-reproducible streams.}
+streams. Setting this makes the entire parallel run reproducible.
+Regardless, each worker receives its own seed to ensure independent
+OSCARS streams across workers.  Default is \code{NULL}, which draws
+non-reproducible streams.}
 
 \item{cl}{An optional pre-existing parallel cluster object created by
 \code{\link[parallel]{makeCluster}}.  If supplied it is used for the runs and
@@ -75,12 +90,22 @@ temporary cluster of \code{ncores} workers is created and stopped
 automatically.}
 }
 \value{
-An object of class \code{"oscars"}: a list with the best parameters
-found (\code{par}), the objective value there (\code{value}), the total number
-of function evaluations over all workers (\code{evaluations}), a convergence
-code (\code{convergence}), a stopping \code{message}, the \code{controls}
-used, the number of cores used (\code{ncores}), and the vector of best values
-from every worker (\code{all.values}).
+A list of class \code{"oscars"} containing results of the optimization.
+This list consists of the following components:
+  \itemize{
+     \item \code{par}: vector containing the best known parameters
+     \item \code{value}: The minimized (or maximized) function value
+     \item \code{evaluations}: The number of function evaluations used
+     \item \code{cycles}: The number of cycles used
+     \item \code{convergence}: 0 if the function and parameter tolerances have been reached;
+      1 if tolerances have not been reached but function evaluation budget has been exhausted;
+      2 if bounds are inconsistent.
+     \item \code{message}: A text string explaining the value in \code{convergence}.
+     \item \code{controls}: The values of the controls provided to oscars.
+     \item \code{ncores}: The number of cores used.
+     \item \code{all.values}: A vector containing the best values returned
+     by every worker.
+  }
 }
 \description{
 \code{poscars} is a parallel wrapper around \code{\link{oscars}} that runs
@@ -120,6 +145,11 @@ self-contained or pass everything it needs through \code{...}.
 }
 \examples{
 \donttest{
+
+# Per CRAN policies, these examples run on only 2 cores.
+# Set ncores = Inf to utilize all cores.
+# Setting ncores = parallel::detectCores()-1 is a good choice.
+
 # Camel function with global minima of f = -1.0316 at
 # (0.0898, 0.7127) and (0.0898, -0.7127) plus four other local minima.
 camel <- function(par) {
@@ -128,7 +158,7 @@ camel <- function(par) {
   4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4 - y^2)
 }
 # Run four independent searches in parallel and keep the best.
-out <- poscars(camel, n = 2, lwr = c(-5, -5), upr = c(5, 5), ncores = 4)
+out <- poscars(camel, n = 2, lwr = c(-5, -5), upr = c(5, 5), ncores = 2)
 out
 
 # Reproducible parallel run via the seed argument.
@@ -145,7 +175,7 @@ out <- poscars(rosenbrock, 2, -3, 3, a = 0.5, ncores = 2)
 
 # Best-of-ncores multi-start: give every worker the full budget instead
 # of dividing it, trading more total work for a more thorough search.
-out <- poscars(camel, 2, -5, 5, ncores = 4, divide.budget = FALSE,
+out <- poscars(camel, 2, -5, 5, ncores = 2, divide.budget = FALSE,
                controls = oscars.control(nfmax = 20000, infol = 0))
 
 # Reuse a single cluster across several calls to avoid start-up cost.
