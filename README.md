@@ -38,23 +38,26 @@ returns the best known point and the function evaluated at that point.
 
 ## Example
 
-To use `oscars`, you must first define the objective function to be minimized.  This 
+To use `oscars`, an objective function is required.  This 
 regular R function 
 must take a vector of parameter values as its first argument, and return a scalar.
-Additional arguments, beyond the first, can be included. 
+Additional arguments, beyond the parameters, can be included in the function 
+definition. 
 The function may return missing (NaN and NA) values. Once the objective function 
-is defined, you supply it to `oscars` where you also specify the number of 
+is defined, supply its name to `oscars` along with the number of 
 parameters, parameter bounds and 
-any other (fixed) parameters that are needed in the objective function. 
+any other (fixed) parameters that are needed to complete objective function
+calculations. 
 
-This is one of the examples in the R documentation files.  It minimizes 
-Branin's camel function, which has a global minimum of *f* = -1.0316 at
-(0.0898,0.7127) and (0.0898,-0.7127) with four other local minimizers.  Here n is the
-number of parameters to be minimized with respect to, and lwr and upr are 
-the vectors of bounds for the problem.
+The following is one of the examples in the `oscars` documentation.  This 
+example minimizes Branin's camel function, which has a global minimum 
+of *f* = -1.0316 at
+(-0.0898,0.7127) and (0.0898,-0.7127) with four other local minimums.  Here `n` = 2 is the
+number of parameters over which the function is minimized, and `lwr` and `upr` are 
+the vectors of bounds defining the search region.
 
 ``` r
-# the camel function
+# the camel objective function
 camel <- function(par) {
    x = par[1]
    y = par[2]
@@ -73,6 +76,11 @@ Minimum value -1.03162845348986 achieved in 1332 evaluations at
  -0.0898420652018077, 0.712656434215101 
  Evaluations stopped because Optimum function value tolerance reached. 
 ```
+
+![*The camel function near (0,0).  Note the two global and four local minimums. OSCARS searched the larger box (-5,5) X (-5,5) and
+found one of the two global minimums. This figure was produced by script [`tools/make-camel-figure.R`](tools/make-camel-figure.R).*](man/figures/camel-surface.png)
+
+
 
 ## Installation
 
