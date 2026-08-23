@@ -77,10 +77,12 @@ Minimum value -1.03162845348986 achieved in 1332 evaluations at
  Evaluations stopped because Optimum function value tolerance reached. 
 ```
 
-![*The camel function near (0,0).  Note the two global and four local minimums. OSCARS searched the larger box (-5,5) X (-5,5) and
-found one of the two global minimums. This figure was produced by script [`tools/make-camel-figure.R`](tools/make-camel-figure.R).*](man/figures/camel-surface.png)
+![](man/figures/camel-surface.png)
 
-
+*The camel function near (0,0).  Note the two global and four local minimums. 
+OSCARS searched the larger box (-5,5) X (-5,5) and found one of the two 
+global minimums. This figure was produced by script 
+[`tools/make-camel-figure.R`](tools/make-camel-figure.R).*
 
 ## Installation
 
