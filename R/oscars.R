@@ -71,18 +71,24 @@
 #' budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
 #' and descriptions.
 #'
-#' @return A list containing results of the optimization.  This list consists of the 
-#' following components: 
+#' @param progress If TRUE, a progress bar is drawn in the console.
+#' The bar appears after one to two seconds, so
+#' quick runs finish without a bar.  Set to FALSE to suppress
+#' the bar entirely.  Default is TRUE.
+#'
+#' @return A list containing results of the optimization.  This list consists of the
+#' following components:
 #'   \itemize{
 #'      \item \code{par}: vector containing the best known parameters
 #'      \item \code{value}: The minimized (or maximized) function value
 #'      \item \code{evaluations}: The number of function evaluations used
 #'      \item \code{cycles}: The number of cycles used
-#'      \item \code{convergence}: 0 if the function and parameter tolerances have been reached;  
+#'      \item \code{convergence}: 0 if the function and parameter tolerances have been reached;
 #'       1 if tolerances have not been reached but function evaluation budget has been exhausted;
 #'       2 if bounds are inconsistent.
 #'      \item \code{message}: A text string explaining the value in \code{convergence}.
 #'      \item \code{controls}: The values of the controls provided to oscars
+#'   }
 #'
 #' @examples
 #' # Camel function with global minima of f = -1.0316 at
@@ -156,6 +162,7 @@ oscars <- function(fname
                   , ...
                   , start = NULL
                   , controls = oscars.control()
+                  , progress = TRUE
                   ){
 
   nfmax = controls$nfmax
@@ -341,6 +348,21 @@ oscars <- function(fname
     boxupr = pmin(upr,xb + MaxBoxSize*pmax(1,abs(xb)))
   }
 
+  # Set up the progress bar.  It counts function evaluations toward the nfmax
+  # budget.  The loop below can halt before that budget is exhausted, in which
+  # case the bar is simply ended where it got to.
+  if (progress) {
+    # Label the budget ourselves; cli's own total field would render a large
+    # nfmax in scientific notation (1e+05 rather than 100,000).
+    nfmaxLabel = format(nfmax, big.mark = ",", scientific = FALSE, trim = TRUE)
+    pbar = cli::cli_progress_bar(
+        total = nfmax
+      , format = paste("OSCARS {cli::pb_bar} {cli::pb_percent} of"
+                     , nfmaxLabel
+                     , "max iterations | {cli::pb_elapsed}")
+    )
+  }
+
   # Begin the main loop.
   while (gogo){
     # Find the position of the new test point and its function value
@@ -463,6 +485,13 @@ oscars <- function(fname
       }
     }
 
+    # Advance the progress bar to the current evaluation count.  nf can step
+    # by more than one when a new cycle starts, and can finish just past
+    # nfmax, so set the bar position outright rather than incrementing it.
+    if (progress) {
+      cli::cli_progress_update(id = pbar, set = min(nf, nfmax))
+    }
+
     #   Check stopping conditions.
     if (nf >= nfmax){
       gogo = FALSE
@@ -480,6 +509,12 @@ oscars <- function(fname
       }
     }
   } # end of while
+
+  # Close the progress bar.  This ends the bar early when the loop stopped
+  # before nfmax evaluations were used, and clears it from the console.
+  if (progress) {
+    cli::cli_progress_done(id = pbar)
+  }
 
   if (DoMax)  fb = -fb
   if (infol > 0) {

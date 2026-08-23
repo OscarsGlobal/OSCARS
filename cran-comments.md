@@ -1,6 +1,7 @@
 ## Submission comments
 
-* This is a new release.
+* Previous submission: 0.1.0 (initial)
+* Current submission: 0.2.1
 
 ## Local R CMD check results
 

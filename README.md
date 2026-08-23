@@ -104,4 +104,6 @@ devtools::install_github("OscarsGlobal/OSCARS")
 ### Caveat
 Keep the following in mind: Black-box optimization methods for arbitrary 
 functions do not and cannot provide certificates of optimality if halted 
-after a finite amount of time. 
+after a finite amount of time. In other words, it is theoretically impossible
+for any routine, including OSCARS, to be absolutely sure a global optimum 
+has been found. 
