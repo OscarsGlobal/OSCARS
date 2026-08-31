@@ -208,6 +208,10 @@ poscars <- function(fname
     ncores <- length(cl)
   }
 
+  # If no seed is provided, generate a single random number stop random number 
+  # generator from generating the same sequence every time.
+  if (is.null(seed))  UnusedVariable = stats::runif(1)
+
   # Give every worker its own independent, and (if seed is set) reproducible,
   # random number stream.  This is what makes the parallel searches diverge.
   parallel::clusterSetRNGStream(cl, iseed = seed)
