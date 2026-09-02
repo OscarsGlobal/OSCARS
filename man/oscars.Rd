@@ -48,9 +48,19 @@ budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
 and descriptions.}
 }
 \value{
-A list containing the best known set of parameters found along with
-function value at the best known parameters.   The number of function
-evaluations used, and reason for halting are also given.
+A list containing results of the optimization.  This list consists of the
+following components:
+  \itemize{
+     \item \code{par}: vector containing the best known parameters
+     \item \code{value}: The minimized (or maximized) function value
+     \item \code{evaluations}: The number of function evaluations used
+     \item \code{cycles}: The number of cycles used
+     \item \code{convergence}: 0 if the function and parameter tolerances have been reached;
+      1 if tolerances have not been reached but function evaluation budget has been exhausted;
+      2 if bounds are inconsistent.
+     \item \code{message}: A text string explaining the value in \code{convergence}.
+     \item \code{controls}: The values of the controls provided to oscars
+     }
 }
 \description{
 Performs black-box optimization of a general function subject to

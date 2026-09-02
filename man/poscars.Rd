@@ -60,7 +60,7 @@ machine it is reduced to that number with a warning.  Default is
 \item{divide.budget}{Logical.  If \code{TRUE} (the default) the total
 evaluation budget \code{controls$nfmax} is divided among the \code{ncores}
 workers, so each worker performs about \code{nfmax / ncores} evaluations. If
-\code{FALSE}, every worker is given the full \code{nfmax} budge.}
+\code{FALSE}, every worker is given the full \code{nfmax} budget.}
 
 \item{seed}{An optional integer used to seed the parallel random number
 streams, making the whole parallel run reproducible.  Each worker
