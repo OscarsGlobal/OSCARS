@@ -89,6 +89,11 @@
 #' budget, tolerance, etc. See \code{\link{oscarsQN.control}} for the full list
 #' and descriptions.
 #'
+#' @param progress If TRUE, a progress bar is drawn in the console.
+#' The bar appears after one to two seconds, so
+#' quick runs finish without a bar.  Set to FALSE to suppress
+#' the bar entirely.  Default is TRUE.
+#'
 #' @return A list containing results of the optimization.  This list consists 
 #' of the following components: 
 #'   \itemize{
@@ -99,11 +104,9 @@
 #'            estimates of the gradient are included in this total, but
 #'            any analytic gradient calculations are not.
 #'      \item \code{cycles}: The number of cycles used.
-#'      \item \code{convergence}: 0 if the function value target has been
-#'         reached, or the required number of best KKT points have been
-#'         found; 1 if neither of these cases have not been achieved but 
-#'         function evaluation budget has been exhausted; 2 if bounds are 
-#'         inconsistent.
+#'      \item \code{convergence}: 0 if the function and parameter tolerances have been reached;
+#'       1 if tolerances have not been reached but function evaluation budget has been exhausted;
+#'       2 if bounds are inconsistent.
 #'      \item \code{message}: A text string explaining the value 
 #'                  in \code{convergence}.
 #'      \item \code{numberKKTpoints}: Number of Karush-Kuhn-Tucker (KKT) 
@@ -233,6 +236,7 @@ oscarsQN <- function(fname
                      , upr
                      , ...
                      , start = NULL
+                     , progress = TRUE
                      , controls = oscarsQN.control()
 ){
   
@@ -457,6 +461,21 @@ oscarsQN <- function(fname
   B = diag(n)
   Bbest = B
   
+  # Set up the progress bar.  It counts function evaluations toward the nfmax
+  # budget.  The loop below can halt before that budget is exhausted, in which
+  # case the bar is simply ended where it got to.
+  if (progress) {
+    # Label the budget ourselves; cli's own total field would render a large
+    # nfmax in scientific notation (1e+05 rather than 100,000).
+    nfmaxLabel = format(nfmax, big.mark = ",", scientific = FALSE, trim = TRUE)
+    pbar = cli::cli_progress_bar(
+        total = nfmax
+      , format = paste("OSCARS {cli::pb_bar} {cli::pb_percent} of"
+                     , nfmaxLabel
+                     , "max iterations | {cli::pb_elapsed}")
+    )
+  }
+
   # Beginning of while.   ( BEGINNING OF MAIN LOOP )  ######################
   while (gogo){
     # Find the position of the new test point and its function value
@@ -668,6 +687,13 @@ oscarsQN <- function(fname
       }
     } # end of if
     
+    # Advance the progress bar to the current evaluation count.  nf can step
+    # by more than one when a new cycle starts, and can finish just past
+    # nfmax, so set the bar position outright rather than incrementing it.
+    if (progress) {
+      cli::cli_progress_update(id = pbar, set = min(nf, nfmax))
+    }
+
     #   Check stopping conditions.
     if (ffinal < fTarget)  {
       gogo = FALSE
@@ -686,6 +712,12 @@ oscarsQN <- function(fname
     }
   } # end of while  (END OF MAIN LOOP)   #####################################
   
+  # Close the progress bar.  This ends the bar early when the loop stopped
+  # before nfmax evaluations were used, and clears it from the console.
+  if (progress) {
+    cli::cli_progress_done(id = pbar)
+  }
+
   if (DoMax)  ffinal = -ffinal
   if (infol > 0) {
     if (DoMax) {
