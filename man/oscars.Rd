@@ -4,7 +4,16 @@
 \alias{oscars}
 \title{OSCARS-II bound constrained global optimization}
 \usage{
-oscars(fname, n, lwr, upr, ..., start = NULL, controls = oscars.control())
+oscars(
+  fname,
+  n,
+  lwr,
+  upr,
+  ...,
+  start = NULL,
+  controls = oscars.control(),
+  progress = TRUE
+)
 }
 \arguments{
 \item{fname}{An R function to be minimized. This function must take a vector
@@ -46,6 +55,11 @@ or zero otherwise.}
 \item{controls}{A list of oscar control parameters, such as iteration
 budget, tolerance, etc. See \code{\link{oscars.control}} for the full list
 and descriptions.}
+
+\item{progress}{If TRUE, a progress bar is drawn in the console.
+The bar appears after one to two seconds, so
+quick runs finish without a bar.  Set to FALSE to suppress
+the bar entirely.  Default is TRUE.}
 }
 \value{
 A list containing results of the optimization.  This list consists of the
@@ -60,7 +74,7 @@ following components:
       2 if bounds are inconsistent.
      \item \code{message}: A text string explaining the value in \code{convergence}.
      \item \code{controls}: The values of the controls provided to oscars
-     }
+  }
 }
 \description{
 Performs black-box optimization of a general function subject to
