@@ -254,7 +254,7 @@ oscarsQN <- function(fname
   QPGradTol = 1e-12
   
   # fix the random seed for testing purposes
-  set.seed(123)
+  # set.seed(123)
   
   if(infol > 0){
     cat("Control parameters:\n")
