@@ -253,9 +253,6 @@ oscarsQN <- function(fname
   # Set the tolerance for the Quadratic Programming subproblem stopping rule.
   QPGradTol = 1e-12
   
-  # fix the random seed for testing purposes
-  # set.seed(123)
-  
   if(infol > 0){
     cat("Control parameters:\n")
     print(do.call(cbind, controls))
