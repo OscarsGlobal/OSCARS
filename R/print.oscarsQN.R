@@ -1,0 +1,44 @@
+#' @title Print method for 'oscars' objects
+#'
+#' @description Prints an 'oscars' object showing minimized (or maximized)
+#' parameters and the optimization message.
+#'
+#' @param x An 'oscars' object returned by \code{oscars}.
+#'
+#' @param \dots Included for compatibility with other print methods.
+#' Ignored here.
+#'
+#' @return No return value, called for side effects. Technically, \code{NULL}
+#' is returned invisibly.
+#'
+#' @seealso \code{\link{oscars}}
+#'
+#' @examples
+#' # Branins camel function with global minimum of f = -1.0316 at
+#' # (0.0898,0.7127) and (0.0898,-0.7127) with four other local minimizers
+#' camel <- function(par) {
+#'   x = par[1]
+#'   y = par[2]
+#'   f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
+#'   return(f) }
+#' out <- oscars(camel, n = 2, lwr = c(-5,-5), upr = c(5,5))
+#' out
+#'
+#' @export
+#'
+print.oscars <- function(x, ...){
+
+  if( x$controls$DoMax ){
+    upDwn <- "Maximum"
+  } else {
+    upDwn <- "Minimum"
+  }
+  if( x$convergence == 0 ){
+    mess <- paste0(upDwn, " value found at ", paste(x$par, collapse = ", "))
+  } else {
+    mess <- paste0(upDwn, " not found in ", x$evaluations, "evaluations.")
+  }
+  mess <- strwrap( mess )
+  cat(paste(mess, "\n"))
+  invisible(NULL)
+}
