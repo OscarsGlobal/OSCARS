@@ -14,14 +14,21 @@
 #' @seealso \code{\link{oscars}}
 #'
 #' @examples
-#' # Branins camel function with global minimum of f = -1.0316 at
-#' # (0.0898,0.7127) and (0.0898,-0.7127) with four other local minimizers
-#' camel <- function(par) {
+#' # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
+#' hosaki <- function(par)  {
 #'   x = par[1]
 #'   y = par[2]
-#'   f = 4*x^2 - 2.1*x^4 + (1/3)*x^6 + x*y + 4*(y^4-y^2)
+#'   f = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*y*y*exp(-y)
 #'   return(f) }
-#' out <- oscars(camel, n = 2, lwr = c(-5,-5), upr = c(5,5))
+#' 
+#' hosakigrad <- function(par)  {
+#'   x = par[1]
+#'   y = par[2]
+#'   g = c(0, 0)
+#'   g[1] = (-8 + 14*x - 7*x^2 + x^3)*y*y*exp(-y)
+#'   g[2] = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*(2-y)*y*exp(-y)
+#'   return(g) }
+#' # out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
 #' out
 #'
 #' @export
