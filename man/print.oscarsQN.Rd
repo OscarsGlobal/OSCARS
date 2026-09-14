@@ -40,5 +40,5 @@ out
 
 }
 \seealso{
-\code{\link{oscars}}
+\code{\link{oscarsQN}}
 }
