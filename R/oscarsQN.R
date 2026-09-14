@@ -296,7 +296,7 @@ oscarsQN <- function(fname
                      , numberbestKKTpoints = 0
                      , controls = controls
     )
-    class(solution) <- "oscarsgrad"
+    class(solution) <- "oscarsQN"
     return(solution)
   }
   
@@ -742,7 +742,7 @@ oscarsQN <- function(fname
                    , numberbestKKTpoints = KKTbestcount
                    , controls = controls
   )
-  class(solution) <- "oscars"
+  class(solution) <- "oscarsQN"
   return(solution)
   
 }   # end of function.
