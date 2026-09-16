@@ -2,6 +2,10 @@
 
 S3method(print,oscars)
 S3method(summary,oscars)
+S3method(print,oscarsQN)
+S3method(summary,oscarsQN)
 export(oscars)
 export(oscars.control)
+export(oscarsQN)
+export(oscarsQN.control)
 export(poscars)

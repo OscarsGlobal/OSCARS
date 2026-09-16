@@ -114,6 +114,7 @@
 #'      \item \code{numberbestKKTpoints}: Number of KKT points found which 
 #'         take the best known function value (within tolerance).
 #'      \item \code{controls}: The values of the controls provided to oscarsQN.
+#'   }
 #'      
 #' @examples
 #' # Camel function with global minima of f = -1.0316 at
@@ -131,7 +132,7 @@
 #'   g[1] = 8*x - 8.4*x^3 + 2*x^5 + y
 #'   g[2] = x + 16*y^3 - 8*y
 #'   return(g) }
-#' # out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
+#' out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
 #' 
 #' 
 #' # Bird function in 2 dimensions.  Global minimum = -106.7645367198
@@ -146,7 +147,7 @@
 #'   g[1] = cos(x1)*exp((1-cos(x2))^2) - 2*cos(x2)*exp((1-sin(x1))^2)*(1-sin(x1))*cos(x1) + 2*(x1-x2)
 #'   g[2] = 2*sin(x1)*exp((1-cos(x2))^2)*(1-cos(x2))*sin(x2) - sin(x2)*exp((1-sin(x1))^2) + 2*(x2-x1)
 #'   return(g) } 
-#' # out <- oscarsQN(bird, birdgrad, 2, -10, 50)
+#' out <- oscarsQN(bird, birdgrad, 2, -10, 50)
 #' 
 #' # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
 #' hosaki <- function(par)  {
@@ -162,7 +163,7 @@
 #'   g[1] = (-8 + 14*x - 7*x^2 + x^3)*y*y*exp(-y)
 #'   g[2] = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*(2-y)*y*exp(-y)
 #'   return(g) }
-#' # out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
+#' out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
 #' 
 #' # Rosenbrocks "banana" function with global minimum of zero at (a, a^2)
 #' rosenbrock <- function(par, a = 1, b = 100) {
@@ -174,7 +175,7 @@
 #'   g[1] = -2*(a - par[1]) + 2*b*(par[2] - par[1]^2)*(-2*par[1])
 #'   g[2] = 2*b*(par[2] - par[1]^2)
 #'   return(g)  }
-#' # out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
+#' out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
 #' 
 #' # Schwefel function with global min of -418.9829n at x_i = 420.97...
 #' # in n dimensions, where n is arbitrary.
@@ -186,8 +187,8 @@
 #'   rootpar = sqrt(abs(par))
 #'   g = -sin(rootpar) - 0.5*rootpar*cos(rootpar)
 #'   return(g)  }
-#' # out <- oscarsQN(schwefel, schwefelgrad, n = 3, -500, 500)
-#' # where the problem has been run in n = 3 dimensions here.
+#' out <- oscarsQN(schwefel, schwefelgrad, n = 3, -500, 500)
+#' # This problem is solved in n = 3 dimensions here.
 #' 
 #' # vardim function with global min of 0 at par[i] = 1 in n dimensions.
 #' vardim <- function(par) {
@@ -203,7 +204,7 @@
 #'   fn1 = sum(temp*(par-1))
 #'   g = 2*(par-1) + (2*fn1 + 4*fn1^3)*temp
 #'   return(g)  }
-#' # out <- oscarsQN(vardim, vardimgrad, n = 5, 0, 2.7182818)
+#' out <- oscarsQN(vardim, vardimgrad, n = 5, 0, 2.7182818)
 
 #' # dixon function with global min of 0 in n dimensions at par[i] = 1.
 #' dixon <- function(par) {
@@ -226,7 +227,7 @@
 #'   }
 #'   g[n] = -2*(1-x[n]) + 2*(x[n-1]^2 - x[n])*(-1)
 #'   return(g)  }
-#' # out <- oscarsQN(dixon, dixongrad, n = 4, -2, 2)
+#' out <- oscarsQN(dixon, dixongrad, n = 4, -2, 2)
 #' 
 #' @export
 
@@ -297,7 +298,7 @@ oscarsQN <- function(fname
                      , numberbestKKTpoints = 0
                      , controls = controls
     )
-    class(solution) <- "oscarsgrad"
+    class(solution) <- "oscarsQN"
     return(solution)
   }
   
@@ -546,7 +547,7 @@ oscarsQN <- function(fname
         # First do the BFGS update on B if oldgc is finite.
       oldgc.ok = CheckGradient(oldgc,n)
       if (!oldgc.ok)   nanDetected = TRUE
-      if (oldgc.ok)   B <- UpdateB(B,xc,gc,oldxc,oldgc,y,n)
+      if (oldgc.ok)   B <- UpdateB(B,xc,gc,oldxc,oldgc,n)
 
       # Then solve the local box constrained QP for proposed step
       QPsol.out <- CLboxQPsolver(xc,gc,B,TRR,upr,lwr,n,QPGradTol)
@@ -743,7 +744,7 @@ oscarsQN <- function(fname
                    , numberbestKKTpoints = KKTbestcount
                    , controls = controls
   )
-  class(solution) <- "oscars"
+  class(solution) <- "oscarsQN"
   return(solution)
   
 }   # end of function.
@@ -812,7 +813,7 @@ GetGradient <- function(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)    {
 }
 
 #------------------------------------------------------------------------------
-UpdateB <- function(B,xc,gc,oldxc,oldgc,y,n)    {
+UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   # Update the matrix B using the BFGS update with minor modifications
   s = xc - oldxc
   y = gc - oldgc
