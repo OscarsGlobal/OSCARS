@@ -132,7 +132,7 @@
 #'   g[1] = 8*x - 8.4*x^3 + 2*x^5 + y
 #'   g[2] = x + 16*y^3 - 8*y
 #'   return(g) }
-#' # out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
+#' out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
 #' 
 #' 
 #' # Bird function in 2 dimensions.  Global minimum = -106.7645367198
@@ -147,7 +147,7 @@
 #'   g[1] = cos(x1)*exp((1-cos(x2))^2) - 2*cos(x2)*exp((1-sin(x1))^2)*(1-sin(x1))*cos(x1) + 2*(x1-x2)
 #'   g[2] = 2*sin(x1)*exp((1-cos(x2))^2)*(1-cos(x2))*sin(x2) - sin(x2)*exp((1-sin(x1))^2) + 2*(x2-x1)
 #'   return(g) } 
-#' # out <- oscarsQN(bird, 2, -10, 50)
+#' out <- oscarsQN(bird, birdgrad, 2, -10, 50)
 #' 
 #' # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
 #' hosaki <- function(par)  {
@@ -163,7 +163,7 @@
 #'   g[1] = (-8 + 14*x - 7*x^2 + x^3)*y*y*exp(-y)
 #'   g[2] = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*(2-y)*y*exp(-y)
 #'   return(g) }
-#' # out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
+#' out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
 #' 
 #' # Rosenbrocks "banana" function with global minimum of zero at (a, a^2)
 #' rosenbrock <- function(par, a = 1, b = 100) {
@@ -175,7 +175,7 @@
 #'   g[1] = -2*(a - par[1]) + 2*b*(par[2] - par[1]^2)*(-2*par[1])
 #'   g[2] = 2*b*(par[2] - par[1]^2)
 #'   return(g)  }
-#' # out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
+#' out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
 #' 
 #' # Schwefel function with global min of -418.9829n at x_i = 420.97...
 #' # in n dimensions, where n is arbitrary.
@@ -187,7 +187,8 @@
 #'   rootpar = sqrt(abs(par))
 #'   g = -sin(rootpar) - 0.5*rootpar*cos(rootpar)
 #'   return(g)  }
-#' # out <- oscarsQN(schwefel, schwefelgrad, dimension_of_problem, -500, 500)
+#' out <- oscarsQN(schwefel, schwefelgrad, n = 3, -500, 500)
+#' # This problem is solved in n = 3 dimensions here.
 #' 
 #' # vardim function with global min of 0 at par[i] = 1 in n dimensions.
 #' vardim <- function(par) {
@@ -203,7 +204,7 @@
 #'   fn1 = sum(temp*(par-1))
 #'   g = 2*(par-1) + (2*fn1 + 4*fn1^3)*temp
 #'   return(g)  }
-#' # out <- oscarsQN(vardim, vardimgrad, dimension_of_problem, 0, 2.7182818)
+#' out <- oscarsQN(vardim, vardimgrad, n = 5, 0, 2.7182818)
 
 #' # dixon function with global min of 0 in n dimensions at par[i] = 1.
 #' dixon <- function(par) {
@@ -226,7 +227,7 @@
 #'   }
 #'   g[n] = -2*(1-x[n]) + 2*(x[n-1]^2 - x[n])*(-1)
 #'   return(g)  }
-#' # out <- oscarsQN(dixon, dixongrad, dimension_of_problem, -2, 2)
+#' out <- oscarsQN(dixon, dixongrad, n = 4, -2, 2)
 #' 
 #' @export
 
