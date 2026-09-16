@@ -27,7 +27,7 @@
 #'   g[1] = (-8 + 14*x - 7*x^2 + x^3)*y*y*exp(-y)
 #'   g[2] = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*(2-y)*y*exp(-y)
 #'   return(g) }
-#' # out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
+#' out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
 
 
 #' summary(out)
