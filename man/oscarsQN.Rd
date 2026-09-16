@@ -2,27 +2,37 @@
 % Please edit documentation in R/oscarsQN.R
 \name{oscarsQN}
 \alias{oscarsQN}
-\title{OSCARS-II-quasi-Newton bound constrained global optimization}
+\title{OSCARS-II-quasi-Newton for bound constrained global optimization}
 \usage{
-oscarsQN(fname, gname, n, lwr, upr, ..., start = NULL, controls = oscarsQN.control())
+oscarsQN(
+  fname,
+  gname = NULL,
+  n,
+  lwr,
+  upr,
+  ...,
+  start = NULL,
+  progress = TRUE,
+  controls = oscarsQN.control()
+)
 }
 \arguments{
-\item{fname}{fname An R function to be minimized. This function must take a vector
+\item{fname}{An R function to be minimized. This function must take a vector
 of parameter values as its first argument, and return a scalar.  Additional
 arguments can be supplied via \code{...}   Missing (NaN and NA) function
 values are acceptable as they are replaced with Inf when minimizing
 (or -Inf when maximizing).}
 
-\item{gname An R function which returns the gradient vector of the function
+\item{gname}{An R function which returns the gradient vector of the function
 \code{fname}.  Default is NULL which results in finite differences being
 used to estimate gradients.   A setting is available in the controls which
 calculates both the finite difference and analytic gradients for comparison.
 When both are calculated, the finite difference gradients are used.
-Additional arguments can be supplied via \code{...}   }
+Additional arguments can be supplied via \code{...}}
 
 \item{n}{The number of parameters with which \code{fname} is minimized.}
 
-\item{lwr}{lwr A vector of lower bounds for the parameters of \code{fname}.
+\item{lwr}{A vector of lower bounds for the parameters of \code{fname}.
 If a single value \code{lwr} is supplied, this value will be used for all
 lower bounds.  Lower bounds of minus infinity are acceptable.  In order to
 maximize oscarsQN's effectiveness, it is recommended that the gap between
@@ -54,15 +64,14 @@ if one bound is finite, it uses a feasible value near that bound; otherwise
 it uses the user supplied start value (if one is given) for that parameter,
 or zero otherwise.}
 
-\item{controls}{controls A list of oscar control parameters, such as iteration
-budget, tolerance, etc. See \code{\link{oscarsQN.control}} for the full list
-and descriptions.}
-
-\item{progress}{ If TRUE, a progress bar is drawn in the console.
+\item{progress}{If TRUE, a progress bar is drawn in the console.
 The bar appears after one to two seconds, so
 quick runs finish without a bar.  Set to FALSE to suppress
-the bar entirely.  Default is TRUE.   }
+the bar entirely.  Default is TRUE.}
 
+\item{controls}{A list of oscar control parameters, such as iteration
+budget, tolerance, etc. See \code{\link{oscarsQN.control}} for the full list
+and descriptions.}
 }
 \value{
 A list containing results of the optimization.  This list consists 
@@ -84,7 +93,8 @@ of the following components:
                  points found.   KKT points are potential minimizers.
      \item \code{numberbestKKTpoints}: Number of KKT points found which 
         take the best known function value (within tolerance).
-     \item \code{controls}: The values of the controls provided to oscarsQN.     
+     \item \code{controls}: The values of the controls provided to oscarsQN.
+   }
 }
 \description{
 Performs global optimization of a general function subject to
@@ -105,6 +115,7 @@ the method has the characteristics of a local method.
 Black-box methods for global optimization of arbitrary functions do not and 
 cannot provide certificates of optimality if halted after a finite amount 
 of time, even if the gradient is available at sample points.
+
 OscarsQN is a stochastic direct search method which uses function values
 and gradients at selected points.   It generates a finite sequence of nested 
 boxes around a control point, and randomly samples each box once, in turn. 
@@ -117,7 +128,7 @@ of an internal initial point and a user supplied start point (if given).
 From time to time the control is reset alternately to a random point, or
 to the best known point.   Each reset marks the end of one cycle and the
 start of the next.   
- 
+
 OscarsQN either performs a fixed number of function evaluations, or it
 halts if a user specified target value has been reached, or the same best
 locally optimal point has been seen a prescribed number of times.   It
@@ -139,9 +150,9 @@ camelgrad <- function(par) {
   g[1] = 8*x - 8.4*x^3 + 2*x^5 + y
   g[2] = x + 16*y^3 - 8*y
   return(g) }
-# out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
- 
- 
+  out <- oscarsQN(camel, camelgrad, n = 2, lwr = c(-5,-5), upr = c(5,5))
+
+
 # Bird function in 2 dimensions.  Global minimum = -106.7645367198
 bird <- function(par)  {
   x1 = par[1];  x2 = par[2]
@@ -154,7 +165,7 @@ birdgrad <- function(par)  {
   g[1] = cos(x1)*exp((1-cos(x2))^2) - 2*cos(x2)*exp((1-sin(x1))^2)*(1-sin(x1))*cos(x1) + 2*(x1-x2)
   g[2] = 2*sin(x1)*exp((1-cos(x2))^2)*(1-cos(x2))*sin(x2) - sin(x2)*exp((1-sin(x1))^2) + 2*(x2-x1)
   return(g) } 
-# out <- oscarsQN(bird, 2, -10, 50)
+  out <- oscarsQN(bird, birdgrad, 2, -10, 50)
 
 # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
 hosaki <- function(par)  {
@@ -170,7 +181,7 @@ hosakigrad <- function(par)  {
   g[1] = (-8 + 14*x - 7*x^2 + x^3)*y*y*exp(-y)
   g[2] = (1 - 8*x + 7*x^2 - (7/3)*x^3 + (1/4)*x^4)*(2-y)*y*exp(-y)
   return(g) }
-# out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
+  out <- oscarsQN(hosaki, hosakigrad, 2, 0, upr = c(5,6))
 
 # Rosenbrocks "banana" function with global minimum of zero at (a, a^2)
 rosenbrock <- function(par, a = 1, b = 100) {
@@ -182,7 +193,7 @@ rosenbrockgrad <- function(par, a = 1, b = 100) {
   g[1] = -2*(a - par[1]) + 2*b*(par[2] - par[1]^2)*(-2*par[1])
   g[2] = 2*b*(par[2] - par[1]^2)
   return(g)  }
-# out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
+  out <- oscarsQN(rosenbrock, rosenbrockgrad, 2, -3, 3, a = 0.5)
 
 # Schwefel function with global min of -418.9829n at x_i = 420.97...
 # in n dimensions, where n is arbitrary.
@@ -194,7 +205,8 @@ schwefelgrad <- function(par) {
   rootpar = sqrt(abs(par))
   g = -sin(rootpar) - 0.5*rootpar*cos(rootpar)
   return(g)  }
-# out <- oscarsQN(schwefel, schwefelgrad, dimension_of_problem, -500, 500)
+  out <- oscarsQN(schwefel, schwefelgrad, n = 3, -500, 500)
+  # where the problem has been run in n = 3 dimensions here.
 
 # vardim function with global min of 0 at par[i] = 1 in n dimensions.
 vardim <- function(par) {
@@ -210,8 +222,7 @@ vardimgrad <- function(par) {
   fn1 = sum(temp*(par-1))
   g = 2*(par-1) + (2*fn1 + 4*fn1^3)*temp
   return(g)  }
-# out <- oscarsQN(vardim, vardimgrad, dimension_of_problem, 0, 2.7182818)
-
+  out <- oscarsQN(vardim, vardimgrad, n = 5, 0, 2.7182818)
 # dixon function with global min of 0 in n dimensions at par[i] = 1.
 dixon <- function(par) {
   n = length(par)
@@ -227,12 +238,12 @@ dixongrad <- function(par) {
   g[1] = -2*(1-x[1]) + 2*(x[1]^2 - x[2])*2*x[1]
   jk = 2
   while (jk < n)  {
-    #cat(sprintf("j = %i \n",jk))
+    #cat(sprintf("j = \%i \n",jk))
     g[jk] = 2*(x[jk]^2 - x[jk+1])*2*x[jk] - 2*(x[jk-1]^2 - x[jk])
     jk = jk+1
   }
   g[n] = -2*(1-x[n]) + 2*(x[n-1]^2 - x[n])*(-1)
   return(g)  }
-# out <- oscarsQN(dixon, dixongrad, dimension_of_problem, -2, 2) 
+  out <- oscarsQN(dixon, dixongrad, n = 4, -2, 2)
 
 }
