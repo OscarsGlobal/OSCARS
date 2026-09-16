@@ -33,7 +33,7 @@
 #'
 #' @export
 #'
-print.oscars <- function(x, ...){
+print.oscarsQN <- function(x, ...){
 
   if( x$controls$DoMax ){
     upDwn <- "Maximum"
