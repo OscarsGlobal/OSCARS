@@ -146,7 +146,7 @@
 #'   g[1] = cos(x1)*exp((1-cos(x2))^2) - 2*cos(x2)*exp((1-sin(x1))^2)*(1-sin(x1))*cos(x1) + 2*(x1-x2)
 #'   g[2] = 2*sin(x1)*exp((1-cos(x2))^2)*(1-cos(x2))*sin(x2) - sin(x2)*exp((1-sin(x1))^2) + 2*(x2-x1)
 #'   return(g) } 
-#' # out <- oscarsQN(bird, 2, -10, 50)
+#' # out <- oscarsQN(bird, birdgrad, 2, -10, 50)
 #' 
 #' # Hosaki function with global minimum of -2.3458 at (4,2) and one local minimum
 #' hosaki <- function(par)  {
@@ -186,7 +186,8 @@
 #'   rootpar = sqrt(abs(par))
 #'   g = -sin(rootpar) - 0.5*rootpar*cos(rootpar)
 #'   return(g)  }
-#' # out <- oscarsQN(schwefel, schwefelgrad, dimension_of_problem, -500, 500)
+#' # out <- oscarsQN(schwefel, schwefelgrad, n = 3, -500, 500)
+#' # where the problem has been run in n = 3 dimensions here.
 #' 
 #' # vardim function with global min of 0 at par[i] = 1 in n dimensions.
 #' vardim <- function(par) {
@@ -202,7 +203,7 @@
 #'   fn1 = sum(temp*(par-1))
 #'   g = 2*(par-1) + (2*fn1 + 4*fn1^3)*temp
 #'   return(g)  }
-#' # out <- oscarsQN(vardim, vardimgrad, dimension_of_problem, 0, 2.7182818)
+#' # out <- oscarsQN(vardim, vardimgrad, n = 5, 0, 2.7182818)
 
 #' # dixon function with global min of 0 in n dimensions at par[i] = 1.
 #' dixon <- function(par) {
@@ -225,7 +226,7 @@
 #'   }
 #'   g[n] = -2*(1-x[n]) + 2*(x[n-1]^2 - x[n])*(-1)
 #'   return(g)  }
-#' # out <- oscarsQN(dixon, dixongrad, dimension_of_problem, -2, 2)
+#' # out <- oscarsQN(dixon, dixongrad, n = 4, -2, 2)
 #' 
 #' @export
 
