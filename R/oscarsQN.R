@@ -114,6 +114,7 @@
 #'      \item \code{numberbestKKTpoints}: Number of KKT points found which 
 #'         take the best known function value (within tolerance).
 #'      \item \code{controls}: The values of the controls provided to oscarsQN.
+#'   }
 #'      
 #' @examples
 #' # Camel function with global minima of f = -1.0316 at
