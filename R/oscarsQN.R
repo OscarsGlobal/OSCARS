@@ -546,7 +546,7 @@ oscarsQN <- function(fname
         # First do the BFGS update on B if oldgc is finite.
       oldgc.ok = CheckGradient(oldgc,n)
       if (!oldgc.ok)   nanDetected = TRUE
-      if (oldgc.ok)   B <- UpdateB(B,xc,gc,oldxc,oldgc,y,n)
+      if (oldgc.ok)   B <- UpdateB(B,xc,gc,oldxc,oldgc,n)
 
       # Then solve the local box constrained QP for proposed step
       QPsol.out <- CLboxQPsolver(xc,gc,B,TRR,upr,lwr,n,QPGradTol)
@@ -812,7 +812,7 @@ GetGradient <- function(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)    {
 }
 
 #------------------------------------------------------------------------------
-UpdateB <- function(B,xc,gc,oldxc,oldgc,y,n)    {
+UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   # Update the matrix B using the BFGS update with minor modifications
   s = xc - oldxc
   y = gc - oldgc
