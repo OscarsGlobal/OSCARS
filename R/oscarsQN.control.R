@@ -61,7 +61,7 @@
 #' @export
 oscarsQN.control <- function(
     nfmax = 50000
-    , infol = 3
+    , infol = 1
     , DoMax = FALSE
     , fTol  = 1e-5
     , xTol  = 1e-8
