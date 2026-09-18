@@ -40,9 +40,9 @@ summary.oscars <- function(object, ...){
     mess2 <- paste0("Evaluations stopped because ", object$message, ".")
   } else {
     mess1 <- paste0("FAILURE: Function ", upDwn, " not found in "
-                    , object$evaluations, "evaluations with")
+                    , object$evaluations, " evaluations with ")
     mess2 <- paste0("function tolerance stopping rule of ", object$controls$fTol
-                  , " and parameter tolerance stopping rule of"
+                  , " and parameter tolerance stopping rule of "
                   , object$controls$xTol)
   }
   mess <- strwrap( c(mess1, mess2) )
