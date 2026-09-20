@@ -7,8 +7,8 @@
 #' @param nfmax The maximum number of function evaluations to perform.
 #' Default for \code{nfmax} is 50000.
 #'
-#' @param infol Verbosity during iterations. If \code{infol} is positive,
-#' each new best function value is printed.   Default is 1.
+#' @param infol Verbosity during iterations. If \code{infol} is greater than 1,
+#' each new best function value is printed.   0 prints nothing.  Default is 1.
 #'
 #' @param DoMax logical variable set to TRUE if the objective is
 #' to be maximized.   Default is FALSE.
