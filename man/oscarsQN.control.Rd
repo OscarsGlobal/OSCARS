@@ -6,7 +6,7 @@
 \usage{
 oscarsQN.control(
   nfmax = 50000,
-  infol = 3,
+  infol = 1,
   DoMax = FALSE,
   fTol = 1e-05,
   xTol = 1e-08,
@@ -20,8 +20,8 @@ oscarsQN.control(
 \item{nfmax}{The maximum number of function evaluations to perform.
 Default for \code{nfmax} is 50000, but is normally adjusted  by the user.}
 
-\item{infol}{Verbosity during iterations. If \code{infol} is positive,
-each new best function value is printed.   Default is 3.}
+\item{infol}{Verbosity during iterations. If \code{infol} is greater than 1,
+each new best function value is printed.   0 prints nothing.  Default is 1.}
 
 \item{DoMax}{logical variable set to TRUE if the objective is
 to be maximized.   Default is \code{FALSE}.}
