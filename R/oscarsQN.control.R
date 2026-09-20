@@ -7,8 +7,8 @@
 #' @param nfmax The maximum number of function evaluations to perform.
 #' Default for \code{nfmax} is 50000, but is normally adjusted  by the user.
 #'
-#' @param infol Verbosity during iterations. If \code{infol} is positive,
-#' each new best function value is printed.   Default is 3.
+#' @param infol Verbosity during iterations. If \code{infol} is greater than 1,
+#' each new best function value is printed.   0 prints nothing.  Default is 1.
 #'
 #' @param DoMax logical variable set to TRUE if the objective is
 #' to be maximized.   Default is \code{FALSE}.
@@ -61,7 +61,7 @@
 #' @export
 oscarsQN.control <- function(
     nfmax = 50000
-    , infol = 3
+    , infol = 1
     , DoMax = FALSE
     , fTol  = 1e-5
     , xTol  = 1e-8
