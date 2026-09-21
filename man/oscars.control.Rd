@@ -6,7 +6,7 @@
 \usage{
 oscars.control(
   nfmax = 50000,
-  infol = 2,
+  infol = 1,
   DoMax = FALSE,
   fTol = 1e-06,
   xTol = 1e-08

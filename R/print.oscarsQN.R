@@ -43,7 +43,7 @@ print.oscarsQN <- function(x, ...){
   if( x$convergence == 0 ){
     mess <- paste0(upDwn, " value found at ", paste(x$par, collapse = ", "))
   } else {
-    mess <- paste0(upDwn, " not found in ", x$evaluations, "evaluations.")
+    mess <- paste0(upDwn, " not found in ", x$evaluations, " evaluations.")
   }
   mess <- strwrap( mess )
   cat(paste(mess, "\n"))

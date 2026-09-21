@@ -49,10 +49,10 @@ summary.oscarsQN <- function(object, ...){
     mess2 <- paste0("Evaluations stopped because ", object$message, ".")
   } else {
     mess1 <- paste0("FAILURE: Function ", upDwn, " not found in "
-                    , object$evaluations, "evaluations with ")
-    mess2 <- paste0(object$controls$kktstopcount, "KKT points with best "
+                    , object$evaluations, " evaluations with ")
+    mess2 <- paste0(object$controls$kktstopcount, " KKT points with best "
                   , "function value within tolerance of "
-                  , object$controls$fTol, "not found and target of "
+                  , object$controls$fTol, " not found and target of "
                   , object$controls$fTarget, " not met.")
   }
   mess <- strwrap( c(mess1, mess2) )

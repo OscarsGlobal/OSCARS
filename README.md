@@ -2,7 +2,9 @@
 
 An R package that performs black-box global minimization of a general function 
 subject to finite bounds on the unknown parameters using a variant of the OSCARS-II 
-algorithm (https://doi.org/10.1007/s10898-020-00928-6).  
+algorithm (https://doi.org/10.1007/s10898-020-00928-6).  A parallel version
+of OSCARS and a version incorporating intermittent quasi-Newton steps are also
+included (https://doi.org/10.1007/s43069-024-00403-y).
 
 ## Description
 Oscars performs black-box minimization (or maximization) of a general function 
@@ -35,6 +37,10 @@ than the first) set the control point equal to the best known point.
 Oscars either performs a fixed number of function evaluations, or it
 halts if progress stalls for a significant period of time.  In both cases it
 returns the best known point and the function evaluated at that point.
+
+A parallel version is also included in the package along with a version
+which uses analytic (if provided) or finite difference gradients to
+implement quasi-Newton steps.
 
 ## Example
 
