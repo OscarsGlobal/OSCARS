@@ -1,9 +1,3 @@
-# OSCARS 0.3.0
-
-* New code `oscarsQN()` which runs a version of oscars with intermittent
-  quasi-Newton steps for improved accuracy and improved performance in
-  high dimensions when there are relatively few local minimizers.
-
 # OSCARS 0.2.1
 
 * `oscars()` gained a `progress` argument (default `TRUE`) that draws a console
@@ -23,6 +17,9 @@
 * `poscars()` gained a `seed` argument for reproducible parallel runs and a
   `cl` argument for reusing a user-supplied cluster across calls.
 * New import of the base `parallel` package.
+* New code `oscarsQN()` which runs a version of oscars with intermittent
+  quasi-Newton steps for improved accuracy and improved performance in
+  high dimensions when there are relatively few local minimizers.
   
 # OSCARS 0.1.1
 
