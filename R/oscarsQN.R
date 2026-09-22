@@ -898,7 +898,7 @@ CLboxQPsolver <- function(xk,Gradient,Hessian,Delta,upr,lwr,n,QPGradTol)   {
       discriminant = wtp^2 - ptp*(wtw-Delta^2)
       if (discriminant > 0) {
         alpha = (-wtp + sqrt(discriminant) )/ptp
-        alphaTR = max(0,alphaTR)
+        alpha = max(0,alpha)
       } else {
         # already at trust region boundary
         alpha = 0  
