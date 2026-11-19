@@ -837,8 +837,12 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
 CheckGradient <- function(Gradient,n)   {
   # Checks the gradient vector for NaN, NA, NULL
   GradOk = TRUE
-  for (ii in 1:n)  {
-    if (is.null(Gradient[ii]) | !is.finite(Gradient[ii]))  GradOk = FALSE
+  if (is.null(Gradient)) {
+    GradOk = FALSE
+  } else {
+    for (ii in 1:n)  {
+      if (is.null(Gradient[ii]) | !is.finite(Gradient[ii]))  GradOk = FALSE
+    }
   }
   return(GradOk)
 }
