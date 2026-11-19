@@ -706,13 +706,11 @@ oscarsQN <- function(fname
       gogo = FALSE
       message = "Target function value reached."
       convergetest = 0
-    }
-      if (KKTbestcount >= KKTstopcount) {
+    } else if (KKTbestcount >= KKTstopcount) {
       gogo = FALSE
       message = "Best value optimal within tolerance required number of times"
       convergetest = 0
-    }
-    if (nf >= nfmax){
+    } else if (nf >= nfmax){
       gogo = FALSE
       message = "Maximum iterations reached"
       convergetest = 1
@@ -810,7 +808,7 @@ GetGradient <- function(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)    {
     }
     xnew[ii] = xc[ii]
   }
-  if (CompareGrad)   {
+  if (CompareGrad & !is.null(gname))   {
     gcc = gname(xc, ...)
     print("finite difference estimate listed first then exact gradient")
     print(gc)
