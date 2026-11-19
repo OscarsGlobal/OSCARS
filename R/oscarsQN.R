@@ -1009,10 +1009,15 @@ GetPsi <- function(xk,Gradient,upr,lwr,n)   {
 Theta <- function(xi) {
   # Calculate function value and derivative of a single Coleman-Li scale factor
   # Used in CLboxQPsolver.
-  
-  xi = abs(xi)   
-  value = xi/(1+xi) 
-  deriv = 1/(1+xi)^2
+
+  if isinfinite(xi)) {
+    value = 1 
+    deriv = 0
+  } else {
+    xi = abs(xi)   
+    value = xi/(1+xi) 
+    deriv = 1/(1+xi)^2
+  }
   Theta.out <- list(value = value,deriv = deriv)
   return(Theta.out)
 }
