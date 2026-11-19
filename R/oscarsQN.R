@@ -420,7 +420,9 @@ oscarsQN <- function(fname
   # Now set up the initial control point, and calculate the gradient there.
   xc = xb
   fc = fb
-  gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+  forig = fc
+  if (DoMax) forig = -forig
+  gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
   gc = gradlist$gc
   fcount = gradlist$fcount
   nf = nf+fcount
@@ -499,7 +501,9 @@ oscarsQN <- function(fname
       fc = newf
       xc = newx
       # calculate the gradient at the new xc
-      gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+      forig = fc
+      if (DoMax) forig = -forig
+      gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
       gc = gradlist$gc
       fcount = gradlist$fcount
       nf = nf+fcount
@@ -574,7 +578,9 @@ oscarsQN <- function(fname
         fc = fnew
         xc = xnew
         # calculate the gradient at the new xc
-        gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+        forig = fc
+        if (DoMax) forig = -forig
+        gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
         gc = gradlist$gc
         fcount = gradlist$fcount
         nf = nf+fcount
@@ -676,7 +682,9 @@ oscarsQN <- function(fname
         }
         nf = nf + 1
 
-        gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+        forig = fc
+        if (DoMax) forig = -forig
+        gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
         gc = gradlist$gc
         fcount = gradlist$fcount
         nf = nf+fcount
