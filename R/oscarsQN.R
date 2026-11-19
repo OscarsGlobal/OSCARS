@@ -828,10 +828,19 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   # Update the matrix B using the BFGS update with minor modifications
   s = xc - oldxc
   y = gc - oldgc
-  sty = max(1e-6,sum(s*y))
+  sty = sum(s*y)
+  sts = sum(s*s)
+  # If step is less than a tolerance, abort update
+  if (sts < 1e-20)   return(B)
   Bs = as.vector(B%*%s)
   sBs = sum(s*Bs)
-  sBsinv = sign(sBs)/max(1e-6,abs(sBs))
+  # If B is not sufficiently positive definite add a multiple of the identity
+  if (sBs < 1e-10)  {
+    lambda = 1e-5 + (abs(sBs)/sts)
+    B <- B + lambda*diag(nrow(B))
+  }
+  # If new curvature not sufficiently positive, dampen correction
+  if (sty < 1e-12)   y = y + ((abs(sty) + 1e-8)/sts)*s
   newB = B - outer(sBsinv*Bs,Bs) + outer(y,y/sty)
   return(newB)
 }
@@ -942,7 +951,7 @@ CLboxQPsolver <- function(xk,Gradient,Hessian,Delta,upr,lwr,n,QPGradTol)   {
       wtest = w + alphaTR*p
     }
     # Find maximum zeta such that xk + zeta*s = xk + zeta*Psi*w is feasible
-    xs = xk + Psi*wtest 
+    xs = xk + Psi*w
     ps = Psi*p
     zeta = Inf
     for (ii in 1:n)   {
