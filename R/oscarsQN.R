@@ -702,7 +702,7 @@ oscarsQN <- function(fname
     }
 
     #   Check stopping conditions.
-    if (ffinal < fTarget)  {
+    if (ffinal <= fTarget)  {
       gogo = FALSE
       message = "Target function value reached."
       convergetest = 0
