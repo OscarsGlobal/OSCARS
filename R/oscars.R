@@ -417,7 +417,34 @@ oscars <- function(fname
       }   # end of for
     }     # end of if 1
 
-    # Check for reset due to maximum length of cycle reached
+    # Update the best point.
+    if (fc < fb) {
+      fsecondb = fb
+      fb = fc
+      xsecondb = xb
+      xb = xc
+      # Print out the new best point information if requested.
+      if (infol > 1)  {
+        if (DoMax) printf = -fb   else   printf = fb
+        cat(sprintf("New best f =   %12.6g   ",printf))
+        cat(sprintf("at %7i fevals   in cycle %5i   ",nf,CycleNr))
+        cat(sprintf("df = %10.4g   ",abs(fb-fsecondb)))
+        dx = sqrt( sum( (xb-xsecondb)^2 ))
+        cat(sprintf("dpar = %10.4g   \n",dx))
+      }
+      # Check if significant progress has been made.  If so reset fmark
+      if (Use_fTol & (fb <= fmark - fgap))   {
+        fmark = fb
+        nfmark = nf
+        # update f value gap within absolute or relative fTol of fmark
+        fgap = fTol*max(1,abs(fmark))
+      }
+    } else if (fc < fsecondb) {
+      fsecondb = fc
+      xsecondb = xc
+    }
+
+   # Check for reset due to maximum length of cycle reached
     if (CycleLength > maxcycle1 + maxcycle2*CycleNr) {
       NewCycle = TRUE
     }
@@ -502,7 +529,7 @@ oscars <- function(fname
       convergetest = 1
     }
     if (Use_fTol & is.finite(fb)) {
-      if ((fb > fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
+      if ((fb >= fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
         xdiff = abs(xsecondb - xb)
         if (max(xdiff - xTol*pmax(1,abs(xb))) <= 0) {
           gogo = FALSE
