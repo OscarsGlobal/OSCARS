@@ -621,7 +621,7 @@ oscarsQN <- function(fname
           if (fb < fbestkkt - fTol*max(1,abs(fb)))   {
             fbestkkt = fb
             KKTbestcount = 1
-          } else if (fb < fbestkkt + fTol*max(1,abs(fb))) {
+          } else if (fb <= fbestkkt + fTol*max(1,abs(fb))) {
             fbestkkt = min(fbestkkt,fb)
             KKTbestcount = KKTbestcount + 1
           } 
