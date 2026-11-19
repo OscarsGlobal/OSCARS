@@ -995,7 +995,7 @@ GetPsi <- function(xk,Gradient,upr,lwr,n)   {
     } else {
       Theta.out = Theta( min(upr[ii] - xk[ii],xk[ii] - lwr[ii]) )
       xksign = 1
-      if (2*xk[ii] > upr[ii] + lwr[ii])  xksign = -1
+      if (upr[ii] - xk[ii] < xk[ii] - lwr[ii])  xksign = -1
     }
     phi[ii] = Theta.out$value
     J[ii] = xksign*Theta.out$deriv
