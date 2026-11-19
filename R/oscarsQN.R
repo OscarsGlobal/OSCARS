@@ -430,6 +430,11 @@ oscarsQN <- function(fname
   gb = gc
   oldxc = xc
   oldgc = gc
+  # Check if initial point is a KKT point
+  if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
+    KKTPointCount = 1
+    KKTbestcount = 1
+  }
   
   # Set up the final point to be returned and initial best kkt point value
   ffinal = fc
