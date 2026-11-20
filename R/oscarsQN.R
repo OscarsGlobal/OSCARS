@@ -624,26 +624,28 @@ oscarsQN <- function(fname
         ffinal = fb
         xfinal = xb
       }
-      # If new control point is a KKT point reset working best to fb = Inf,
-      # and start a new cycle from a random control point
-      if (CheckGradient(gb,n))   {
-        if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
-          KKTPointFound = TRUE
-          KKTPointCount = KKTPointCount + 1
-          # Update the count of number of times this kkt fbest has been found
-          if (fb < fbestkkt - fTol*max(1,abs(fb)))   {
-            fbestkkt = fb
-            KKTbestcount = 1
-          } else if (fb <= fbestkkt + fTol*max(1,abs(fb))) {
-            fbestkkt = min(fbestkkt,fb)
-            KKTbestcount = KKTbestcount + 1
-          } 
-          # Now reset to the start of a new cycle and reset the working best.
-          NewCycle = TRUE
-          NextResetBest = FALSE
-          fb = Inf
-        }
+    }
+    
+    # If new control point is a KKT point reset working best to fb = Inf,
+    # and start a new cycle from a random control point
+    if (CheckGradient(gb,n))   {
+      if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
+        KKTPointFound = TRUE
+        KKTPointCount = KKTPointCount + 1
+        # Update the count of number of times this kkt fbest has been found
+        if (fb < fbestkkt - fTol*max(1,abs(fb)))   {
+          fbestkkt = fb
+          KKTbestcount = 1
+        } else if (fb <= fbestkkt + fTol*max(1,abs(fb))) {
+          fbestkkt = min(fbestkkt,fb)
+          KKTbestcount = KKTbestcount + 1
+        } 
+        # Now reset to the start of a new cycle and reset the working best.
+        NewCycle = TRUE
+        NextResetBest = FALSE
+        fb = Inf
       }
+      
       # Print out the new best point information if requested.
       if (infol > 1)  {
         if (DoMax) printff = -ffinal   else   printff = ffinal
