@@ -439,7 +439,7 @@ oscars <- function(fname
         # update f value gap within absolute or relative fTol of fmark
         fgap = fTol*max(1,abs(fmark))
       }
-    } else if (fc < fsecondb) {
+    } else if (fc < fsecondb && any(xb!=xc)) {
       fsecondb = fc
       xsecondb = xc
     }
@@ -510,7 +510,7 @@ oscars <- function(fname
         # update f value gap within absolute or relative fTol of fmark
         fgap = fTol*max(1,abs(fmark))
       }
-    } else if (fc < fsecondb) {
+    } else if (fc < fsecondb && any(xc!=xb)) {
       fsecondb = fc
       xsecondb = xc
     }
