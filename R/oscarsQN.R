@@ -699,6 +699,20 @@ oscarsQN <- function(fname
       }
     } # end of if
     
+    # Update the best point.
+    if (fc < fb) {
+      fb = fc
+      xb = xc
+      gb = gc
+      Bbest = B
+      TRRbest = TRR
+      # Update the final point to be reported
+      if (fb < ffinal)   {
+        ffinal = fb
+        xfinal = xb
+      }
+    }
+
     # Advance the progress bar to the current evaluation count.  nf can step
     # by more than one when a new cycle starts, and can finish just past
     # nfmax, so set the bar position outright rather than incrementing it.
