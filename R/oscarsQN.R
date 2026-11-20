@@ -436,7 +436,8 @@ oscarsQN <- function(fname
   if (!gc.ok)   nanDetected = TRUE
   
   # Check if initial point is a KKT point
-  if (gc.ok)  {
+  fbestkkt = Inf
+  if (is.finite(fb) && gc.ok)  {
     if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
       KKTPointCount = 1
       KKTbestcount = 1
@@ -447,7 +448,6 @@ oscarsQN <- function(fname
   # Set up the final point to be returned and initial best kkt point value
   ffinal = fc
   xfinal = xc
-  fbestkkt = Inf
   
   # Print out function value at better of user and internal initial points
   if (infol > 0){
@@ -628,7 +628,7 @@ oscarsQN <- function(fname
     
     # If new control point is a KKT point reset working best to fb = Inf,
     # and start a new cycle from a random control point
-    if (CheckGradient(gb,n))   {
+    if (is.finite(fb) && CheckGradient(gb,n))   {
       if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
         KKTPointFound = TRUE
         KKTPointCount = KKTPointCount + 1
@@ -1055,7 +1055,7 @@ Theta <- function(xi) {
   # Calculate function value and derivative of a single Coleman-Li scale factor
   # Used in CLboxQPsolver.
 
-  if is.infinite(xi)) {
+  if (is.infinite(xi)) {
     value = 1 
     deriv = 0
   } else {
