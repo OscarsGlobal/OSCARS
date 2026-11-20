@@ -430,10 +430,18 @@ oscarsQN <- function(fname
   gb = gc
   oldxc = xc
   oldgc = gc
+  
+  # Check the current gradient is finite
+  gc.ok = CheckGradient(gc,n)
+  if (!gc.ok)   nanDetected = TRUE
+  
   # Check if initial point is a KKT point
-  if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
-    KKTPointCount = 1
-    KKTbestcount = 1
+  if (gc.ok)  {
+    if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
+      KKTPointCount = 1
+      KKTbestcount = 1
+      fbestkkt = fb
+    }
   }
   
   # Set up the final point to be returned and initial best kkt point value
