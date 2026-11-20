@@ -413,7 +413,7 @@ oscarsQN <- function(fname
   CycleLength = 1
   KKTPointCount = 0
   KKTbestcount = 0
-  fbestkkt = inf
+  fbestkkt = Inf
 
   # Set the finite difference increment value
   h = 1e-6
