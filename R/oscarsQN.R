@@ -851,7 +851,7 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   sBs = sum(s*Bs)
   # If B is not sufficiently positive definite add a multiple of the identity
   if (sBs < 1e-10)  {
-    lambda = 1e-5 + (abs(sBs)/sts)
+    lambda = 1 + (abs(sBs)/sts)
     B <- B + lambda*diag(nrow(B))
     Bs = as.vector(B%*%s)
     sBs = sum(s*Bs)
@@ -862,6 +862,10 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
     sty = sum(s*y)
   }
   newB = B - outer(Bs,Bs/sBs) + outer(y,y/sty)
+  # if divide by zero or other error has resulted, reset B to identity
+  if (any(is.infinite(newB)) || any(is.nan(newB)) ) {
+    newB = diag(nrow(B))
+  }
   return(newB)
 }
 
