@@ -838,10 +838,15 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   if (sBs < 1e-10)  {
     lambda = 1e-5 + (abs(sBs)/sts)
     B <- B + lambda*diag(nrow(B))
+    Bs = as.vector(B%*%s)
+    sBs = sum(s*Bs)
   }
   # If new curvature not sufficiently positive, dampen correction
-  if (sty < 1e-12)   y = y + ((abs(sty) + 1e-8)/sts)*s
-  newB = B - outer(sBsinv*Bs,Bs) + outer(y,y/sty)
+  if (sty < 1e-12)  {
+    y = y + ((abs(sty) + 1e-8)/sts)*s
+    sty = sum(s*y)
+  }
+  newB = B - outer(Bs,Bs/sBs) + outer(y,y/sty)
   return(newB)
 }
 
@@ -1026,7 +1031,7 @@ Theta <- function(xi) {
   # Calculate function value and derivative of a single Coleman-Li scale factor
   # Used in CLboxQPsolver.
 
-  if isinfinite(xi)) {
+  if is.infinite(xi)) {
     value = 1 
     deriv = 0
   } else {
