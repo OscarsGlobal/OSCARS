@@ -413,6 +413,7 @@ oscarsQN <- function(fname
   CycleLength = 1
   KKTPointCount = 0
   KKTbestcount = 0
+  fbestkkt = Inf
 
   # Set the finite difference increment value
   h = 1e-6
@@ -420,7 +421,9 @@ oscarsQN <- function(fname
   # Now set up the initial control point, and calculate the gradient there.
   xc = xb
   fc = fb
-  gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+  forig = fc
+  if (DoMax) forig = -forig
+  gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
   gc = gradlist$gc
   fcount = gradlist$fcount
   nf = nf+fcount
@@ -429,10 +432,13 @@ oscarsQN <- function(fname
   oldxc = xc
   oldgc = gc
   
+  # Check the current gradient is finite
+  gc.ok = CheckGradient(gc,n)
+  if (!gc.ok)   nanDetected = TRUE
+  
   # Set up the final point to be returned and initial best kkt point value
   ffinal = fc
   xfinal = xc
-  fbestkkt = Inf
   
   # Print out function value at better of user and internal initial points
   if (infol > 0){
@@ -499,7 +505,9 @@ oscarsQN <- function(fname
       fc = newf
       xc = newx
       # calculate the gradient at the new xc
-      gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+      forig = fc
+      if (DoMax) forig = -forig
+      gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
       gc = gradlist$gc
       fcount = gradlist$fcount
       nf = nf+fcount
@@ -574,7 +582,9 @@ oscarsQN <- function(fname
         fc = fnew
         xc = xnew
         # calculate the gradient at the new xc
-        gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+        forig = fc
+        if (DoMax) forig = -forig
+        gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
         gc = gradlist$gc
         fcount = gradlist$fcount
         nf = nf+fcount
@@ -605,26 +615,28 @@ oscarsQN <- function(fname
         ffinal = fb
         xfinal = xb
       }
-      # If new control point is a KKT point reset working best to fb = Inf,
-      # and start a new cycle from a random control point
-      if (CheckGradient(gb,n))   {
-        if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
-          KKTPointFound = TRUE
-          KKTPointCount = KKTPointCount + 1
-          # Update the count of number of times this kkt fbest has been found
-          if (fb < fbestkkt - fTol*max(1,abs(fb)))   {
-            fbestkkt = fb
-            KKTbestcount = 1
-          } else if (fb < fbestkkt + fTol*max(1,abs(fb))) {
-            fbestkkt = min(fbestkkt,fb)
-            KKTbestcount = KKTbestcount + 1
-          } 
-          # Now reset to the start of a new cycle and reset the working best.
-          NewCycle = TRUE
-          NextResetBest = FALSE
-          fb = Inf
-        }
+    }
+    
+    # If new control point is a KKT point reset working best to fb = Inf,
+    # and start a new cycle from a random control point
+    if (is.finite(fb) && CheckGradient(gb,n))   {
+      if ( KKTtest(xb,gb,lwr,upr,kktTol) )  {
+        KKTPointFound = TRUE
+        KKTPointCount = KKTPointCount + 1
+        # Update the count of number of times this kkt fbest has been found
+        if (fb < fbestkkt - fTol*max(1,abs(fb)))   {
+          fbestkkt = fb
+          KKTbestcount = 1
+        } else if (fb <= fbestkkt + fTol*max(1,abs(fb))) {
+          fbestkkt = min(fbestkkt,fb)
+          KKTbestcount = KKTbestcount + 1
+        } 
+        # Now reset to the start of a new cycle and reset the working best.
+        NewCycle = TRUE
+        NextResetBest = FALSE
+        fb = Inf
       }
+      
       # Print out the new best point information if requested.
       if (infol > 1)  {
         if (DoMax) printff = -ffinal   else   printff = ffinal
@@ -676,7 +688,9 @@ oscarsQN <- function(fname
         }
         nf = nf + 1
 
-        gradlist <- GetGradient(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)
+        forig = fc
+        if (DoMax) forig = -forig
+        gradlist <- GetGradient(fname,gname,forig,xc,h,lwr,upr,n,CompareGrad, ...)
         gc = gradlist$gc
         fcount = gradlist$fcount
         nf = nf+fcount
@@ -686,6 +700,20 @@ oscarsQN <- function(fname
       }
     } # end of if
     
+    # Update the best point.
+    if (fc < fb) {
+      fb = fc
+      xb = xc
+      gb = gc
+      Bbest = B
+      TRRbest = TRR
+      # Update the final point to be reported
+      if (fb < ffinal)   {
+        ffinal = fb
+        xfinal = xb
+      }
+    }
+
     # Advance the progress bar to the current evaluation count.  nf can step
     # by more than one when a new cycle starts, and can finish just past
     # nfmax, so set the bar position outright rather than incrementing it.
@@ -694,17 +722,15 @@ oscarsQN <- function(fname
     }
 
     #   Check stopping conditions.
-    if (ffinal < fTarget)  {
+    if (ffinal <= fTarget)  {
       gogo = FALSE
       message = "Target function value reached."
       convergetest = 0
-    }
-      if (KKTbestcount >= KKTstopcount) {
+    } else if (KKTbestcount >= KKTstopcount) {
       gogo = FALSE
       message = "Best value optimal within tolerance required number of times"
       convergetest = 0
-    }
-    if (nf >= nfmax){
+    } else if (nf >= nfmax){
       gogo = FALSE
       message = "Maximum iterations reached"
       convergetest = 1
@@ -726,6 +752,11 @@ oscarsQN <- function(fname
     }
     cat(sprintf("%12.6g    Max feval = %7i, used = %7i.   ",ffinal,nfmax,nf))
     cat(sprintf("KKT Tol on f = %8.4g   Dec Var Tol = %8.4g \n\n",fTol,xTol))
+    if (is.finite(fTarget)) {
+      fTargetVal = fTarget
+      if (DoMax) fTargetVal = -fTarget
+      cat(sprintf(" Fcn value Target = %12.6g    ",fTargetVal))
+    }
     cat(sprintf(" Number of KKT points found = %2i   Number ",KKTPointCount))
     cat(sprintf("within tolerance of best known = %2i \n\n",KKTbestcount))
     if (nanDetected)  {
@@ -802,7 +833,7 @@ GetGradient <- function(fname,gname,fc,xc,h,lwr,upr,n,CompareGrad, ...)    {
     }
     xnew[ii] = xc[ii]
   }
-  if (CompareGrad)   {
+  if (CompareGrad & !is.null(gname))   {
     gcc = gname(xc, ...)
     print("finite difference estimate listed first then exact gradient")
     print(gc)
@@ -817,11 +848,29 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   # Update the matrix B using the BFGS update with minor modifications
   s = xc - oldxc
   y = gc - oldgc
-  sty = max(1e-6,sum(s*y))
+  sty = sum(s*y)
+  sts = sum(s*s)
+  # If step is less than a tolerance, abort update
+  if (sts < 1e-20)   return(B)
   Bs = as.vector(B%*%s)
   sBs = sum(s*Bs)
-  sBsinv = sign(sBs)/max(1e-6,abs(sBs))
-  newB = B - outer(sBsinv*Bs,Bs) + outer(y,y/sty)
+  # If B is not sufficiently positive definite add a multiple of the identity
+  if (sBs < 1e-10)  {
+    lambda = 1 + (abs(sBs)/sts)
+    B <- B + lambda*diag(nrow(B))
+    Bs = as.vector(B%*%s)
+    sBs = sum(s*Bs)
+  }
+  # If new curvature not sufficiently positive, dampen correction
+  if (sty < 1e-12)  {
+    y = y + ((abs(sty) + 1e-8)/sts)*s
+    sty = sum(s*y)
+  }
+  newB = B - outer(Bs,Bs/sBs) + outer(y,y/sty)
+  # if divide by zero or other error has resulted, reset B to identity
+ if ( any(is.nan(newB)) || norm(newB, type = 'M') > 1e12) {
+    newB = diag(nrow(B))
+  }
   return(newB)
 }
 
@@ -829,8 +878,12 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
 CheckGradient <- function(Gradient,n)   {
   # Checks the gradient vector for NaN, NA, NULL
   GradOk = TRUE
-  for (ii in 1:n)  {
-    if (is.null(Gradient[ii]) | !is.finite(Gradient[ii]))  GradOk = FALSE
+  if (is.null(Gradient)) {
+    GradOk = FALSE
+  } else {
+    for (ii in 1:n)  {
+      if (is.null(Gradient[ii]) | !is.finite(Gradient[ii]))  GradOk = FALSE
+    }
   }
   return(GradOk)
 }
@@ -927,7 +980,7 @@ CLboxQPsolver <- function(xk,Gradient,Hessian,Delta,upr,lwr,n,QPGradTol)   {
       wtest = w + alphaTR*p
     }
     # Find maximum zeta such that xk + zeta*s = xk + zeta*Psi*w is feasible
-    xs = xk + Psi*wtest 
+    xs = xk + Psi*w
     ps = Psi*p
     zeta = Inf
     for (ii in 1:n)   {
@@ -987,7 +1040,7 @@ GetPsi <- function(xk,Gradient,upr,lwr,n)   {
     } else {
       Theta.out = Theta( min(upr[ii] - xk[ii],xk[ii] - lwr[ii]) )
       xksign = 1
-      if (2*xk[ii] > upr[ii] + lwr[ii])  xksign = -1
+      if (upr[ii] - xk[ii] < xk[ii] - lwr[ii])  xksign = -1
     }
     phi[ii] = Theta.out$value
     J[ii] = xksign*Theta.out$deriv
@@ -1001,10 +1054,15 @@ GetPsi <- function(xk,Gradient,upr,lwr,n)   {
 Theta <- function(xi) {
   # Calculate function value and derivative of a single Coleman-Li scale factor
   # Used in CLboxQPsolver.
-  
-  xi = abs(xi)   
-  value = xi/(1+xi) 
-  deriv = 1/(1+xi)^2
+
+  if (is.infinite(xi)) {
+    value = 1 
+    deriv = 0
+  } else {
+    xi = abs(xi)   
+    value = xi/(1+xi) 
+    deriv = 1/(1+xi)^2
+  }
   Theta.out <- list(value = value,deriv = deriv)
   return(Theta.out)
 }

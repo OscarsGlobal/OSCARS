@@ -391,8 +391,8 @@ oscars <- function(fname
         boxlwr = lwr
         boxupr = upr
       } else {
-        boxlwr = pmax(lwr,xb - MaxBoxSize*pmax(1,abs(xc)))
-        boxupr = pmin(upr,xb + MaxBoxSize*pmax(1,abs(xc)))
+        boxlwr = pmax(lwr,xc - MaxBoxSize*pmax(1,abs(xc)))
+        boxupr = pmin(upr,xc + MaxBoxSize*pmax(1,abs(xc)))
       }
     } else {
       # new point not better than control so keep control & shrink sampling box
@@ -417,7 +417,34 @@ oscars <- function(fname
       }   # end of for
     }     # end of if 1
 
-    # Check for reset due to maximum length of cycle reached
+    # Update the best point.
+    if (fc < fb) {
+      fsecondb = fb
+      fb = fc
+      xsecondb = xb
+      xb = xc
+      # Print out the new best point information if requested.
+      if (infol > 1)  {
+        if (DoMax) printf = -fb   else   printf = fb
+        cat(sprintf("New best f =   %12.6g   ",printf))
+        cat(sprintf("at %7i fevals   in cycle %5i   ",nf,CycleNr))
+        cat(sprintf("df = %10.4g   ",abs(fb-fsecondb)))
+        dx = sqrt( sum( (xb-xsecondb)^2 ))
+        cat(sprintf("dpar = %10.4g   \n",dx))
+      }
+      # Check if significant progress has been made.  If so reset fmark
+      if (Use_fTol & (fb <= fmark - fgap))   {
+        fmark = fb
+        nfmark = nf
+        # update f value gap within absolute or relative fTol of fmark
+        fgap = fTol*max(1,abs(fmark))
+      }
+    } else if (fc < fsecondb && any(xb!=xc)) {
+      fsecondb = fc
+      xsecondb = xc
+    }
+
+   # Check for reset due to maximum length of cycle reached
     if (CycleLength > maxcycle1 + maxcycle2*CycleNr) {
       NewCycle = TRUE
     }
@@ -483,6 +510,9 @@ oscars <- function(fname
         # update f value gap within absolute or relative fTol of fmark
         fgap = fTol*max(1,abs(fmark))
       }
+    } else if (fc < fsecondb && any(xc!=xb)) {
+      fsecondb = fc
+      xsecondb = xc
     }
 
     # Advance the progress bar to the current evaluation count.  nf can step
@@ -498,8 +528,8 @@ oscars <- function(fname
       message = "Maximum iterations reached"
       convergetest = 1
     }
-    if (Use_fTol) {
-      if ((fb > fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
+    if (Use_fTol & is.finite(fb)) {
+      if ((fb >= fmark - fgap) & (nf > stallratio*nfmark) & (CycleNr > MinNrCycles))  {
         xdiff = abs(xsecondb - xb)
         if (max(xdiff - xTol*pmax(1,abs(xb))) <= 0) {
           gogo = FALSE
