@@ -866,7 +866,7 @@ UpdateB <- function(B,xc,gc,oldxc,oldgc,n)    {
   }
   newB = B - outer(Bs,Bs/sBs) + outer(y,y/sty)
   # if divide by zero or other error has resulted, reset B to identity
- if ( any(is.nan(newB)) || norm(newB, type = 'M') > 1e20) {
+ if ( any(is.nan(newB)) || norm(newB, type = 'M') > 1e12) {
     newB = diag(nrow(B))
   }
   return(newB)
