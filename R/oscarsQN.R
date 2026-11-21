@@ -752,9 +752,11 @@ oscarsQN <- function(fname
     }
     cat(sprintf("%12.6g    Max feval = %7i, used = %7i.   ",ffinal,nfmax,nf))
     cat(sprintf("KKT Tol on f = %8.4g   Dec Var Tol = %8.4g \n\n",fTol,xTol))
-    fTargetVal = fTarget
-    if (DoMax) fTargetVal = -fTarget
-    cat(sprintf(" Fcn value Target = %12.6g    ",fTargetVal))
+    if (is.finite(fTarget)) {
+      fTargetVal = fTarget
+      if (DoMax) fTargetVal = -fTarget
+      cat(sprintf(" Fcn value Target = %12.6g    ",fTargetVal))
+    }
     cat(sprintf(" Number of KKT points found = %2i   Number ",KKTPointCount))
     cat(sprintf("within tolerance of best known = %2i \n\n",KKTbestcount))
     if (nanDetected)  {
